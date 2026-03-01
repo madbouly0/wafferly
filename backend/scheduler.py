@@ -1,5 +1,5 @@
 """
-Wafferly Scheduler 🧇
+Wafferly Scheduler
 Runs the cron job to update all tracked products at regular intervals.
 
 Usage:
@@ -22,7 +22,7 @@ INTERVAL_HOURS = 6
 def run_cron_job():
     """Call the cron endpoint to update all products."""
     print(f"\n{'='*50}")
-    print(f"🧇 Wafferly Scheduler - Running at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f" Wafferly Scheduler - Running at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*50}")
 
     try:
@@ -32,16 +32,14 @@ def run_cron_job():
         print(f"Status: {response.status_code}")
         print(f"Result: {data}")
 
-    except requests.exceptions.ConnectionError:
-        print("❌ Could not connect to Flask API. Is the server running?")
     except Exception as e:
-        print(f"❌ Scheduler error: {e}")
+        print(f" Scheduler error: {e}")
 
 
 if __name__ == "__main__":
-    print(f"🧇 Wafferly Scheduler Started!")
-    print(f"📅 Will update products every {INTERVAL_HOURS} hours")
-    print(f"🌐 API URL: {API_URL}")
+    print(f" Wafferly Scheduler Started!")
+    print(f" Will update products every {INTERVAL_HOURS} hours")
+    print(f" API URL: {API_URL}")
     print(f"{'='*50}")
 
     # Run once immediately on startup
@@ -50,7 +48,6 @@ if __name__ == "__main__":
     # Schedule to run every X hours
     schedule.every(INTERVAL_HOURS).hours.do(run_cron_job)
 
-    print(f"\n⏰ Scheduler is running. Press Ctrl+C to stop.")
     print(f"Next run in {INTERVAL_HOURS} hours...\n")
 
     while True:
