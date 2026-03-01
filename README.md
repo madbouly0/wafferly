@@ -2,6 +2,8 @@
 
 Track Amazon product prices and get email alerts when prices drop!
 
+🔗 **[View Live Site](https://madbouly0.github.io/wafferly/)**
+
 ## Features
 
 - 🔍 **Search & Track** — Paste any Amazon product link to start tracking
