@@ -28,10 +28,7 @@ const ProductDetails = () => {
         setLoading(false)
       }
     }
-
-    if (params.id) {
-      fetchProduct()
-    }
+    if (params.id) fetchProduct()
   }, [params.id])
 
   if (loading) {
@@ -45,19 +42,19 @@ const ProductDetails = () => {
   if (!product) {
     return (
       <div className="product-container">
-        <p className="text-xl text-red-500">Product not found</p>
-        <Link href="/" className="text-primary underline">
-          Go back home
-        </Link>
+        <p className="text-xl" style={{ color: 'var(--color-dark)' }}>Product not found</p>
+        <Link href="/" className="text-primary underline">Go back home</Link>
       </div>
     )
   }
 
   return (
     <div className="product-container">
-      {/* TOP SECTION */}
-      <div className="flex gap-16 xl:flex-row flex-col">
-        {/* PRODUCT IMAGE */}
+
+      {/* TWO-COLUMN LAYOUT */}
+      <div className="flex gap-10 xl:flex-row flex-col">
+
+        {/* LEFT — Product image */}
         <div className="product-image">
           <Image
             src={product.image}
@@ -68,195 +65,155 @@ const ProductDetails = () => {
           />
         </div>
 
-        {/* PRODUCT INFO — Right Column */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex justify-between items-start gap-5 flex-wrap pb-6">
-            <div>
-              <p className="text-sm text-gray-500 opacity-70">
-                {product.category}
-              </p>
-              <h1 className="text-2xl font-semibold text-secondary">
+        {/* RIGHT — Green info panel (title lives here, no separate hero banner) */}
+        <div className="product-info-col">
+
+          {/* Title + action icons row */}
+          <div className="flex justify-between items-start gap-4 flex-wrap" style={{ marginBottom: '1.25rem' }}>
+            <div style={{ flex: 1 }}>
+              {product.category && (
+                <p style={{
+                  fontSize: '0.7rem', fontWeight: 700,
+                  letterSpacing: '0.07em', textTransform: 'uppercase',
+                  color: 'var(--color-secondary)', marginBottom: '0.35rem'
+                }}>
+                  {product.category}
+                </p>
+              )}
+              <h1 style={{
+                fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                fontWeight: 700, color: '#ffffff', lineHeight: 1.25
+              }}>
                 {product.title}
               </h1>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2" style={{ flexShrink: 0 }}>
               <div className="product-hearts">
-                <Image
-                  src="/assets/icons/red-heart.svg"
-                  alt="heart"
-                  width={20}
-                  height={20}
-                />
-                <p className="text-sm font-semibold text-primary">
-                  {product.reviewsCount}
-                </p>
+                <Image src="/assets/icons/red-heart.svg" alt="heart" width={18} height={18} />
+                <p className="text-sm font-semibold">{product.reviewsCount}</p>
               </div>
-
-              <div className="p-2 bg-white-200 rounded-10 cursor-pointer">
-                <Image
-                  src="/assets/icons/bookmark.svg"
-                  alt="bookmark"
-                  width={20}
-                  height={20}
-                />
+              <div className="p-2 rounded-10 cursor-pointer" style={{ background: 'rgba(255,255,255,0.12)' }}>
+                <Image src="/assets/icons/bookmark.svg" alt="bookmark" width={18} height={18}
+                  style={{ filter: 'brightness(0) invert(1)' }} />
               </div>
-
-              <div className="p-2 bg-white-200 rounded-10 cursor-pointer">
-                <Image
-                  src="/assets/icons/share.svg"
-                  alt="share"
-                  width={20}
-                  height={20}
-                />
+              <div className="p-2 rounded-10 cursor-pointer" style={{ background: 'rgba(255,255,255,0.12)' }}>
+                <Image src="/assets/icons/share.svg" alt="share" width={18} height={18}
+                  style={{ filter: 'brightness(0) invert(1)' }} />
               </div>
             </div>
           </div>
 
-          {/* PRICE & INFO */}
+          {/* Price & ratings */}
           <div className="product-info">
-            <div className="flex flex-col gap-2">
-              <p className="text-3xl font-bold text-secondary">
+            <div className="flex flex-col gap-1">
+              <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-secondary)' }}>
                 {product.currency} {product.currentPrice}
               </p>
-              <p className="text-xl text-black line-through opacity-50">
+              <p style={{ fontSize: '1rem', textDecoration: 'line-through', color: 'rgba(255,255,255,0.4)' }}>
                 {product.currency} {product.originalPrice}
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-3">
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
                 <div className="product-stars">
-                  <Image
-                    src="/assets/icons/star.svg"
-                    alt="star"
-                    width={16}
-                    height={16}
-                  />
-                  <p className="text-sm font-semibold text-primary-orange">
+                  <Image src="/assets/icons/star.svg" alt="star" width={14} height={14} />
+                  <p className="text-sm font-semibold" style={{ color: 'var(--color-secondary)' }}>
                     {product.stars}
                   </p>
                 </div>
-
                 <div className="product-reviews">
-                  <Image
-                    src="/assets/icons/comment.svg"
-                    alt="comment"
-                    width={16}
-                    height={16}
-                  />
-                  <p className="text-sm font-semibold text-secondary">
+                  <Image src="/assets/icons/comment.svg" alt="comment" width={14} height={14}
+                    style={{ filter: 'brightness(0) invert(1)' }} />
+                  <p className="text-sm font-semibold" style={{ color: '#fff' }}>
                     {product.reviewsCount} Reviews
                   </p>
                 </div>
               </div>
-
-              <p className="text-sm text-black opacity-50">
-                <span className="text-primary-green font-bold">93% </span>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
+                <span style={{ color: '#6ee77a', fontWeight: 700 }}>93% </span>
                 of buyers recommended this product
               </p>
             </div>
           </div>
 
-          {/* PRICE INFO CARDS */}
-          <div className="my-7 flex flex-col gap-5">
-            <div className="flex gap-5 flex-wrap">
-              <PriceInfoCard
-                title="Current Price"
-                iconSrc="/assets/icons/price-tag.svg"
-                value={`${product.currency} ${product.currentPrice}`}
-                borderColor="#b6dbff"
-              />
-              <PriceInfoCard
-                title="Average Price"
-                iconSrc="/assets/icons/chart.svg"
-                value={`${product.currency} ${product.averagePrice}`}
-                borderColor="#8B5CF6"
-              />
-              <PriceInfoCard
-                title="Highest Price"
-                iconSrc="/assets/icons/arrow-up.svg"
-                value={`${product.currency} ${product.highestPrice}`}
-                borderColor="#E43030"
-              />
-              <PriceInfoCard
-                title="Lowest Price"
-                iconSrc="/assets/icons/arrow-down.svg"
-                value={`${product.currency} ${product.lowestPrice}`}
-                borderColor="#3E9242"
-              />
-            </div>
+          {/* Price info cards */}
+          <div style={{ margin: '1.5rem 0', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <PriceInfoCard
+              title="Current Price"
+              iconSrc="/assets/icons/price-tag.svg"
+              value={`${product.currency} ${product.currentPrice}`}
+              borderColor="#b6dbff"
+            />
+            <PriceInfoCard
+              title="Average Price"
+              iconSrc="/assets/icons/chart.svg"
+              value={`${product.currency} ${product.averagePrice}`}
+              borderColor="#8B5CF6"
+            />
+            <PriceInfoCard
+              title="Highest Price"
+              iconSrc="/assets/icons/arrow-up.svg"
+              value={`${product.currency} ${product.highestPrice}`}
+              borderColor="#E43030"
+            />
+            <PriceInfoCard
+              title="Lowest Price"
+              iconSrc="/assets/icons/arrow-down.svg"
+              value={`${product.currency} ${product.lowestPrice}`}
+              borderColor="#3E9242"
+            />
           </div>
 
-          {/* ACTION BUTTONS */}
+          {/* Action buttons */}
           <div className="flex flex-col gap-3">
             <a
               href={product.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn flex items-center justify-center gap-3 min-w-[200px] w-fit"
+              className="btn flex items-center justify-center gap-3"
+              style={{ minWidth: '200px', width: 'fit-content' }}
             >
-              <Image
-                src="/assets/icons/bag.svg"
-                alt="buy"
-                width={22}
-                height={22}
-                style={{ filter: 'brightness(0) invert(1)' }}
-              />
+              <Image src="/assets/icons/bag.svg" alt="buy" width={20} height={20}
+                style={{ filter: 'brightness(0) invert(1)' }} />
               <span className="text-base text-white">Buy Now</span>
             </a>
-
             <button
-              className="btn flex items-center justify-center gap-3 min-w-[200px] w-fit"
-              style={{ backgroundColor: '#E43030' }}
+              className="btn flex items-center justify-center gap-3"
+              style={{ backgroundColor: '#E43030', minWidth: '200px', width: 'fit-content' }}
               onClick={() => setIsModalOpen(true)}
             >
-              <Image
-                src="/assets/icons/mail.svg"
-                alt="mail"
-                width={22}
-                height={22}
-                style={{ filter: 'brightness(0) invert(1)' }}
-              />
+              <Image src="/assets/icons/mail.svg" alt="mail" width={20} height={20}
+                style={{ filter: 'brightness(0) invert(1)' }} />
               <span className="text-base text-white">Track Price</span>
             </button>
           </div>
 
-          {/* PRICE CHART — Inside Right Column, Below Buttons */}
-          <PriceChart
-            priceHistory={product.priceHistory}
-            currency={product.currency}
-          />
+          {/* Price chart */}
+          <PriceChart priceHistory={product.priceHistory} currency={product.currency} />
+
         </div>
       </div>
 
       {/* DESCRIPTION */}
       <div className="flex flex-col gap-5">
-        <h3 className="text-2xl font-semibold text-secondary">
+        <h3 className="text-2xl font-semibold" style={{ color: 'var(--color-dark)' }}>
           Product Description
         </h3>
-
         <div className="flex flex-col gap-4">
           {product.description ? (
             product.description.split('\n').map((line, index) => (
-              <p key={index} className="text-base text-gray-600 leading-7">
-                {line}
-              </p>
+              <p key={index} className="text-base text-gray-600 leading-7">{line}</p>
             ))
           ) : (
-            <p className="text-base text-gray-500">
-              No description available for this product.
-            </p>
+            <p className="text-base text-gray-500">No description available for this product.</p>
           )}
         </div>
       </div>
 
-      {/* MODAL */}
-      <Modal
-        productId={product.id}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <Modal productId={product.id} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
     </div>
   )
 }

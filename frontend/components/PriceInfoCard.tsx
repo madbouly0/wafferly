@@ -7,17 +7,27 @@ interface Props {
   borderColor: string
 }
 
-const PriceInfoCard = ({ title, iconSrc, value, borderColor }: Props) => {
-  return (
-    <div className="price-info_card" style={{ borderLeftColor: borderColor }}>
-      <p className="text-base text-black-100">{title}</p>
-
-      <div className="flex gap-1">
-        <Image src={iconSrc} alt={title} width={24} height={24} />
-        <p className="text-2xl font-bold text-secondary">{value}</p>
-      </div>
+const PriceInfoCard = ({ title, iconSrc, value, borderColor }: Props) => (
+  <div
+    className="price-info_card"
+    style={{ borderLeftColor: borderColor }}
+  >
+    {/* Label row */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+      <Image
+        src={iconSrc}
+        alt=""
+        aria-hidden="true"
+        width={16}
+        height={16}
+        style={{ filter: 'brightness(0) invert(1)', opacity: 0.7 }}
+      />
+      <span className="price-label">{title}</span>
     </div>
-  )
-}
+
+    {/* Value */}
+    <p className="price-value">{value}</p>
+  </div>
+)
 
 export default PriceInfoCard

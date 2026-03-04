@@ -10,7 +10,7 @@ products_bp = Blueprint('products', __name__)
 
 @products_bp.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "ok", "message": "Wafferly API is running 🧇"})
+    return jsonify({"status": "ok", "message": "Wafferly API is running "})
 
 
 @products_bp.route('/products', methods=['GET'])
@@ -127,7 +127,6 @@ def scrape_product():
             db.refresh(new_product)
 
             return jsonify({
-                "message": "Product scraped and saved successfully",
                 "data": new_product.to_dict()
             }), 201
 
@@ -177,7 +176,7 @@ def subscribe_to_product(product_id):
             }
         )
 
-        return jsonify({"message": "Subscribed successfully! Check your email for confirmation."}), 201
+        return jsonify({"message": "Tracked successfully! Check your email for confirmation."}), 201
 
     except Exception as e:
         db.rollback()
