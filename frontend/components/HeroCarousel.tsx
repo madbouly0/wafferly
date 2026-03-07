@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { watch } from 'fs'
 
 /* Static showcase items — replace image srcs with your actual assets */
 const SLIDES = [
@@ -55,21 +54,19 @@ const HeroCarousel = () => {
   return (
     <div className="hero-carousel" aria-label="Featured products carousel" aria-live="polite">
 
-      {/* Product image — floats above the card */}
+      {/* Product image — levitates with radial glow backlight */}
       <Link href={slide.href} tabIndex={-1} aria-hidden="true">
-        <div style={{
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          height: '320px', position: 'relative',
-        }}>
+        <div className="carousel-glow">
           <Image
             src={slide.image}
             alt={slide.title}
             width={280}
             height={280}
+            className="hero-carousel-img"
             style={{
               objectFit: 'contain', maxHeight: '280px',
               filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.25))',
-              transition: 'all .4s ease',
+              position: 'relative', zIndex: 1,
             }}
             priority
           />

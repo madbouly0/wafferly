@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { scrapeProduct } from '@/lib/api'
 
 const isValidAmazonProductURL = (url: string) => {
@@ -13,6 +14,7 @@ const isValidAmazonProductURL = (url: string) => {
 }
 
 const Searchbar = () => {
+  const router = useRouter()
   const [searchPrompt, setSearchPrompt] = useState('')
   const [isLoading, setIsLoading]       = useState(false)
   const [error, setError]               = useState('')
@@ -28,9 +30,11 @@ const Searchbar = () => {
 
     try {
       setIsLoading(true)
-      await scrapeProduct(searchPrompt)
+      // scrapeProduct returns the product data including its id
+      const result = await scrapeProduct(searchPrompt)
       setSearchPrompt('')
-      window.location.reload()
+      // Navigate directly to the product page using the returned product id
+      router.push(`/products/${result.data.id}`)
     } catch {
       setError('Failed to track product. Please try again.')
     } finally {
@@ -73,7 +77,7 @@ const Searchbar = () => {
                 aria-hidden="true">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
               </svg>
-              Searching…
+              Tracking…
             </span>
           ) : 'Search'}
         </button>
@@ -90,7 +94,6 @@ const Searchbar = () => {
         </p>
       )}
 
-      {/* Spinner keyframe */}
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )

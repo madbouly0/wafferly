@@ -24,8 +24,22 @@ export const scrapeProduct = async (url: string) => {
   return response.data;
 };
 
-export const subscribeToProduct = async (productId: number, email: string) => {
-  const response = await api.post(`/products/${productId}/subscribe`, { email });
+export const subscribeToProduct = async (
+  productId: number,
+  email: string,
+  targetPrice?: number   // optional — if provided, only notify when price drops below this
+) => {
+  const body: { email: string; targetPrice?: number } = { email }
+  if (targetPrice !== undefined) {
+    body.targetPrice = targetPrice
+  }
+  const response = await api.post(`/products/${productId}/subscribe`, body);
+  return response.data;
+};
+
+export const unsubscribe = async (token: string) => {
+  // Call the backend unsubscribe endpoint with the user's unique token
+  const response = await api.get(`/unsubscribe/${token}`);
   return response.data;
 };
 

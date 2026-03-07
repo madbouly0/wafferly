@@ -1,11 +1,14 @@
 from sqlalchemy import Column, Integer, String, DECIMAL, DateTime, Boolean, Text, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
+import uuid
 
+# Base is the parent class that all our database models will inherit from
 Base = declarative_base()
 
 
 class Product(Base):
+    # This tells SQLAlchemy which table in the database this class maps to
     __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -27,11 +30,12 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationships
+    # These link the product to its price history and subscriber records
     price_history = relationship('PriceHistory', back_populates='product', cascade='all, delete-orphan')
     subscribers = relationship('ProductSubscriber', back_populates='product', cascade='all, delete-orphan')
 
     def to_dict(self):
+        # Convert this product into a plain dictionary so we can send it as JSON
         return {
             'id': self.id,
             'url': self.url,
@@ -64,7 +68,7 @@ class PriceHistory(Base):
     price = Column(DECIMAL(10, 2), nullable=False)
     recorded_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationship
+    # Link back to the product this price belongs to
     product = relationship('Product', back_populates='price_history')
 
     def to_dict(self):
@@ -82,11 +86,22 @@ class ProductSubscriber(Base):
     email = Column(String(320), nullable=False)
     subscribed_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationship
+    # target_price: the user's personal price goal — e.g. "notify me when it drops below $40"
+    # This is optional — if None, we fall back to notifying on any price drop
+    target_price = Column(DECIMAL(10, 2), nullable=True)
+
+    # unsubscribe_token: a unique random string we put in every email
+    # When the user clicks "Unsubscribe", this token tells us which subscription to delete
+    # We use uuid4() to generate a different random token for every subscriber
+    unsubscribe_token = Column(String(100), nullable=False, default=lambda: str(uuid.uuid4()))
+
+    # Link back to the product this subscriber is watching
     product = relationship('Product', back_populates='subscribers')
 
     def to_dict(self):
         return {
             'email': self.email,
+            'targetPrice': float(self.target_price) if self.target_price else None,
             'subscribedAt': self.subscribed_at.isoformat() if self.subscribed_at else None,
+            'unsubscribeToken': self.unsubscribe_token,
         }

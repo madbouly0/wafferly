@@ -11,13 +11,15 @@ import json
 
 
 def get_chrome_driver():
-    """Create and return a headless Chrome browser instance."""
+    # Set up Chrome to run in the background (headless = no visible window)
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
+
+    # Pretend to be a real browser so Amazon doesn't block us
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -29,20 +31,28 @@ def get_chrome_driver():
     return driver
 
 
-def extract_price(*elements):
-    """Extract price from a list of possible text values."""
-    for text in elements:
+def extract_price(*text_values):
+    """
+    Try each text value one by one and return the first valid price we find.
+    We strip out everything except digits and dots.
+    """
+    for text in text_values:
         if text:
-            clean = re.sub(r'[^\d.]', '', text.strip())
-            if clean:
-                match = re.search(r'\d+\.?\d{0,2}', clean)
+            # Remove everything that is not a digit or a dot
+            cleaned = re.sub(r'[^\d.]', '', text.strip())
+            if cleaned:
+                # Find the first number like "19.99" or "19"
+                match = re.search(r'\d+\.?\d{0,2}', cleaned)
                 if match:
                     return match.group()
     return ''
 
 
 def extract_description(soup):
-    """Extract product description from Amazon page."""
+    """
+    Try a few different CSS selectors to find the product description.
+    Return the first one that has actual text.
+    """
     selectors = [
         "#feature-bullets .a-list-item",
         ".a-expander-content p",
@@ -52,123 +62,155 @@ def extract_description(soup):
     for selector in selectors:
         elements = soup.select(selector)
         if elements:
-            texts = [el.get_text(strip=True) for el in elements]
-            # Filter out empty strings and common junk
-            texts = [t for t in texts if t and len(t) > 5]
-            if texts:
-                return "\n".join(texts)
+            # Get the text from each element
+            lines = []
+            for el in elements:
+                text = el.get_text(strip=True)
+                # Skip empty lines or very short ones
+                if text and len(text) > 5:
+                    lines.append(text)
+
+            if lines:
+                return "\n".join(lines)
 
     return ""
 
 
 def scrape_amazon_product(url):
     """
-    Scrape an Amazon product page using Selenium + BeautifulSoup.
-    Returns a dictionary with product data, or None if scraping fails.
+    Visit an Amazon product page and pull out all the info we need.
+    Returns a dictionary with the product data, or None if something goes wrong.
     """
     if not url:
         return None
 
     driver = None
+
     try:
+        # Open the browser and go to the product page
         driver = get_chrome_driver()
         driver.get(url)
 
-        # Wait for the product title to load
+        # Wait up to 15 seconds for the title to appear on the page
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "productTitle"))
         )
 
-        # Get page source and parse with BeautifulSoup
+        # Parse the full page HTML with BeautifulSoup
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        # --- Extract Title ---
-        title_el = soup.select_one("#productTitle")
-        title = title_el.get_text(strip=True) if title_el else ""
+        # --- Get the product title ---
+        title_element = soup.select_one("#productTitle")
+        title = title_element.get_text(strip=True) if title_element else ""
 
-        # --- Extract Current Price ---
-        current_price_texts = [
-            soup.select_one(".priceToPay .a-price-whole"),
-            soup.select_one(".a-price .a-offscreen"),
-            soup.select_one("#priceblock_ourprice"),
-            soup.select_one(".a-button-selected .a-color-base"),
-        ]
-        current_price_values = [
-            el.get_text(strip=True) if el else '' for el in current_price_texts
-        ]
-        current_price = extract_price(*current_price_values)
+        # --- Get the current price ---
+        # Amazon shows prices in a few different places depending on the page layout
+        price_element_1 = soup.select_one(".priceToPay .a-price-whole")
+        price_element_2 = soup.select_one(".a-price .a-offscreen")
+        price_element_3 = soup.select_one("#priceblock_ourprice")
+        price_element_4 = soup.select_one(".a-button-selected .a-color-base")
 
-        # --- Extract Original Price ---
-        original_price_texts = [
-            soup.select_one(".a-price.a-text-price .a-offscreen"),
-            soup.select_one("#listPrice"),
-            soup.select_one("#priceblock_dealprice"),
-            soup.select_one(".a-size-base.a-color-price"),
-        ]
-        original_price_values = [
-            el.get_text(strip=True) if el else '' for el in original_price_texts
-        ]
-        original_price = extract_price(*original_price_values)
+        current_price_text_1 = price_element_1.get_text(strip=True) if price_element_1 else ''
+        current_price_text_2 = price_element_2.get_text(strip=True) if price_element_2 else ''
+        current_price_text_3 = price_element_3.get_text(strip=True) if price_element_3 else ''
+        current_price_text_4 = price_element_4.get_text(strip=True) if price_element_4 else ''
 
-        # --- Extract Out of Stock ---
-        availability_el = soup.select_one("#availability span")
+        current_price = extract_price(
+            current_price_text_1,
+            current_price_text_2,
+            current_price_text_3,
+            current_price_text_4,
+        )
+
+        # --- Get the original (before sale) price ---
+        orig_element_1 = soup.select_one(".a-price.a-text-price .a-offscreen")
+        orig_element_2 = soup.select_one("#listPrice")
+        orig_element_3 = soup.select_one("#priceblock_dealprice")
+        orig_element_4 = soup.select_one(".a-size-base.a-color-price")
+
+        orig_price_text_1 = orig_element_1.get_text(strip=True) if orig_element_1 else ''
+        orig_price_text_2 = orig_element_2.get_text(strip=True) if orig_element_2 else ''
+        orig_price_text_3 = orig_element_3.get_text(strip=True) if orig_element_3 else ''
+        orig_price_text_4 = orig_element_4.get_text(strip=True) if orig_element_4 else ''
+
+        original_price = extract_price(
+            orig_price_text_1,
+            orig_price_text_2,
+            orig_price_text_3,
+            orig_price_text_4,
+        )
+
+        # --- Check if the item is out of stock ---
+        availability_element = soup.select_one("#availability span")
         out_of_stock = False
-        if availability_el:
-            out_of_stock = "currently unavailable" in availability_el.get_text(strip=True).lower()
+        if availability_element:
+            availability_text = availability_element.get_text(strip=True).lower()
+            if "currently unavailable" in availability_text:
+                out_of_stock = True
 
-        # --- Extract Image ---
+        # --- Get the product image URL ---
         image_url = ""
-        img_el = soup.select_one("#imgBlkFront") or soup.select_one("#landingImage")
-        if img_el:
-            dynamic_images = img_el.get("data-a-dynamic-image", "{}")
+        img_element = soup.select_one("#imgBlkFront") or soup.select_one("#landingImage")
+
+        if img_element:
+            # Amazon stores multiple image sizes in a JSON string on the element
+            dynamic_images_json = img_element.get("data-a-dynamic-image", "{}")
             try:
-                image_urls = list(json.loads(dynamic_images).keys())
+                image_urls = list(json.loads(dynamic_images_json).keys())
                 if image_urls:
                     image_url = image_urls[0]
             except json.JSONDecodeError:
-                image_url = img_el.get("src", "")
+                # If JSON parsing fails, just grab the regular src attribute
+                image_url = img_element.get("src", "")
 
-        # --- Extract Currency ---
-        currency_el = soup.select_one(".a-price-symbol")
-        currency = currency_el.get_text(strip=True)[:1] if currency_el else "$"
+        # --- Get the currency symbol ---
+        currency_element = soup.select_one(".a-price-symbol")
+        if currency_element:
+            currency = currency_element.get_text(strip=True)[:1]
+        else:
+            currency = "$"
 
-        # --- Extract Discount ---
-        discount_el = soup.select_one(".savingsPercentage")
+        # --- Get the discount percentage ---
         discount_rate = 0
-        if discount_el:
-            discount_text = re.sub(r'[-%]', '', discount_el.get_text(strip=True))
-            discount_rate = int(discount_text) if discount_text.isdigit() else 0
+        discount_element = soup.select_one(".savingsPercentage")
+        if discount_element:
+            # Remove the minus sign and percent sign, then convert to a number
+            discount_text = re.sub(r'[-%]', '', discount_element.get_text(strip=True))
+            if discount_text.isdigit():
+                discount_rate = int(discount_text)
 
-        # --- Extract Description ---
+        # --- Get the product description ---
         description = extract_description(soup)
 
-        # --- Extract Stars ---
+        # --- Get the star rating ---
         stars = 0
-        stars_el = soup.select_one("#acrPopover .a-icon-alt")
-        if stars_el:
-            stars_match = re.search(r'[\d.]+', stars_el.get_text(strip=True))
+        stars_element = soup.select_one("#acrPopover .a-icon-alt")
+        if stars_element:
+            stars_match = re.search(r'[\d.]+', stars_element.get_text(strip=True))
             if stars_match:
                 stars = float(stars_match.group())
 
-        # --- Extract Reviews Count ---
+        # --- Get the number of reviews ---
         reviews_count = 0
-        reviews_el = soup.select_one("#acrCustomerReviewText")
-        if reviews_el:
-            reviews_match = re.search(r'[\d,]+', reviews_el.get_text(strip=True))
+        reviews_element = soup.select_one("#acrCustomerReviewText")
+        if reviews_element:
+            reviews_match = re.search(r'[\d,]+', reviews_element.get_text(strip=True))
             if reviews_match:
+                # Remove commas before converting to int (e.g. "1,234" -> 1234)
                 reviews_count = int(reviews_match.group().replace(',', ''))
 
-        # --- Build Data ---
+        # Convert prices to floats (or 0 if we couldn't find them)
         cp = float(current_price) if current_price else 0
         op = float(original_price) if original_price else 0
 
-        data = {
+        # Build the final data dictionary
+        product_data = {
             "url": url,
             "currency": currency or "$",
             "image": image_url,
             "title": title,
-            "currentPrice": cp or op,
-            "originalPrice": op or cp,
+            "currentPrice": cp or op,      # Fall back to original price if no current price
+            "originalPrice": op or cp,     # Fall back to current price if no original price
             "priceHistory": [],
             "discountRate": discount_rate,
             "category": "category",
@@ -181,12 +223,13 @@ def scrape_amazon_product(url):
             "averagePrice": cp or op,
         }
 
-        return data
+        return product_data
 
     except Exception as e:
         print(f"Error scraping product: {e}")
         return None
 
     finally:
+        # Always close the browser, even if something went wrong
         if driver:
             driver.quit()

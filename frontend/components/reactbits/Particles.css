@@ -1,0 +1,22 @@
+.particles-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    /* Fallback if WebGL fails */
+    background: transparent;
+}
+
+.particles-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Disable WebGL canvas for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .particles-container canvas {
+        display: none;
+    }
+}

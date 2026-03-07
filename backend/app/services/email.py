@@ -5,6 +5,11 @@ from config import Config
 
 config = Config()
 
+# The base URL of our frontend — used to build the unsubscribe link in emails
+FRONTEND_URL = "http://localhost:3000"
+
+# These are the email templates for each type of notification we can send
+# {unsubscribe_url} is added to every template so users can always opt out
 NOTIFICATION_TYPES = {
     'LOWEST_PRICE': {
         'subject': '🧇 Wafferly Alert: Lowest Price Ever!',
@@ -14,7 +19,9 @@ NOTIFICATION_TYPES = {
             "Current Price: {currency} {price}\n\n"
             "Don't miss out — grab it now before the price goes back up!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇"
+            "— Wafferly 🧇\n\n"
+            "---\n"
+            "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'CHANGE_OF_STOCK': {
@@ -25,7 +32,9 @@ NOTIFICATION_TYPES = {
             "Current Price: {currency} {price}\n\n"
             "Hurry up — it might sell out again!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇"
+            "— Wafferly 🧇\n\n"
+            "---\n"
+            "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'THRESHOLD_MET': {
@@ -37,7 +46,9 @@ NOTIFICATION_TYPES = {
             "Discount: {discount}% off!\n\n"
             "This deal won't last long!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇"
+            "— Wafferly 🧇\n\n"
+            "---\n"
+            "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'PRICE_DROP': {
@@ -48,37 +59,63 @@ NOTIFICATION_TYPES = {
             "New Price: {currency} {price}\n"
             "Previous Price: {currency} {old_price}\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇"
+            "— Wafferly 🧇\n\n"
+            "---\n"
+            "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
+        ),
+    },
+    'TARGET_REACHED': {
+        'subject': '🧇 Wafferly Alert: Your Target Price Was Hit!',
+        'body': (
+            "Great news! A product you're tracking just dropped to your target price!\n\n"
+            "Product: {title}\n"
+            "Your Target Price: {currency} {target_price}\n"
+            "Current Price:     {currency} {price}\n\n"
+            "This is the price you were waiting for — act now!\n\n"
+            "View on Amazon: {url}\n\n"
+            "— Wafferly 🧇\n\n"
+            "---\n"
+            "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
 }
 
 
-def send_email(to_email, notification_type, product_data):
+def send_email(to_email, notification_type, product_data, unsubscribe_token=None):
     """
-    Send an email notification to a subscriber.
+    Send one email to a subscriber.
 
-    Args:
-        to_email: Recipient email address
-        notification_type: One of 'LOWEST_PRICE', 'CHANGE_OF_STOCK', 'THRESHOLD_MET', 'PRICE_DROP'
-        product_data: Dict with keys: title, currency, price, url, discount, old_price
+    to_email            - the email address to send to
+    notification_type   - which template to use (e.g. 'PRICE_DROP')
+    product_data        - a dict with product info to fill in the template
+    unsubscribe_token   - the subscriber's unique token for the unsubscribe link
     """
+    # If we have no email credentials set up, skip sending
     if not config.MAIL_USERNAME or not config.MAIL_PASSWORD:
         print("Email credentials not configured. Skipping email.")
         return False
 
+    # Look up the email template
     template = NOTIFICATION_TYPES.get(notification_type)
     if not template:
         print(f"Unknown notification type: {notification_type}")
         return False
 
     try:
-        # Build the email
+        # Build the unsubscribe URL using the subscriber's unique token
+        # e.g. http://localhost:3000/unsubscribe/abc-123-def-456
+        if unsubscribe_token:
+            unsubscribe_url = f"{FRONTEND_URL}/unsubscribe/{unsubscribe_token}"
+        else:
+            unsubscribe_url = f"{FRONTEND_URL}"
+
+        # Build the email message
         msg = MIMEMultipart()
         msg['From'] = config.MAIL_USERNAME
         msg['To'] = to_email
         msg['Subject'] = template['subject']
 
+        # Fill in the template with actual product data + the unsubscribe link
         body = template['body'].format(
             title=product_data.get('title', 'Unknown Product'),
             currency=product_data.get('currency', '$'),
@@ -86,11 +123,13 @@ def send_email(to_email, notification_type, product_data):
             url=product_data.get('url', ''),
             discount=product_data.get('discount', 0),
             old_price=product_data.get('old_price', 0),
+            target_price=product_data.get('target_price', 0),
+            unsubscribe_url=unsubscribe_url,
         )
 
         msg.attach(MIMEText(body, 'plain'))
 
-        # Send the email
+        # Connect to Gmail and send the message
         with smtplib.SMTP(config.MAIL_SERVER, config.MAIL_PORT) as server:
             server.starttls()
             server.login(config.MAIL_USERNAME, config.MAIL_PASSWORD)
@@ -106,16 +145,17 @@ def send_email(to_email, notification_type, product_data):
 
 def notify_subscribers(product, notification_type):
     """
-    Send email notifications to all subscribers of a product.
+    Send an email to every subscriber of a product.
+    Each subscriber gets their own personalised unsubscribe link.
 
-    Args:
-        product: Product SQLAlchemy object (with subscribers relationship)
-        notification_type: Type of notification
+    product           - the Product object from the database
+    notification_type - which kind of email to send
     """
     if not product.subscribers:
         print(f"No subscribers for product: {product.title}")
         return
 
+    # Build the shared product info — same for every subscriber
     product_data = {
         'title': product.title,
         'currency': product.currency,
@@ -126,8 +166,16 @@ def notify_subscribers(product, notification_type):
     }
 
     success_count = 0
+
     for subscriber in product.subscribers:
-        if send_email(subscriber.email, notification_type, product_data):
+        # Pass each subscriber's unique token so their email has their own unsubscribe link
+        email_sent = send_email(
+            subscriber.email,
+            notification_type,
+            product_data,
+            unsubscribe_token=subscriber.unsubscribe_token,
+        )
+        if email_sent:
             success_count += 1
 
     print(f"Notified {success_count}/{len(product.subscribers)} subscribers for: {product.title}")

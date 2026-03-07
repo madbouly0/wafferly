@@ -1,12 +1,11 @@
 """
 Wafferly Scheduler
-Runs the cron job to update all tracked products at regular intervals.
+
+This script runs in the background and calls the cron endpoint
+every 6 hours to keep all product prices up to date.
 
 Usage:
     python scheduler.py
-
-This will scrape all products every 6 hours and send email notifications
-when prices change.
 """
 
 import time
@@ -15,22 +14,25 @@ import schedule
 from datetime import datetime
 
 
+# The base URL of our Flask API
 API_URL = "http://localhost:5000/api"
-INTERVAL_HOURS = 6
+
+# How often to update products (in hours)
+INTERVAL_HOURS = 24
 
 
 def run_cron_job():
-    """Call the cron endpoint to update all products."""
+    # Call the cron endpoint to update all products
     print(f"\n{'='*50}")
     print(f" Wafferly Scheduler - Running at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*50}")
 
     try:
         response = requests.get(f"{API_URL}/cron/update-products", timeout=300)
-        data = response.json()
+        result = response.json()
 
         print(f"Status: {response.status_code}")
-        print(f"Result: {data}")
+        print(f"Result: {result}")
 
     except Exception as e:
         print(f" Scheduler error: {e}")
@@ -42,14 +44,15 @@ if __name__ == "__main__":
     print(f" API URL: {API_URL}")
     print(f"{'='*50}")
 
-    # Run once immediately on startup
+    # Run once right away when we start
     run_cron_job()
 
-    # Schedule to run every X hours
+    # Then schedule it to run again every X hours
     schedule.every(INTERVAL_HOURS).hours.do(run_cron_job)
 
     print(f"Next run in {INTERVAL_HOURS} hours...\n")
 
+    # Keep the script running forever, checking every minute if a job is due
     while True:
         schedule.run_pending()
-        time.sleep(60)  # Check every minute
+        time.sleep(60)

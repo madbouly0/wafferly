@@ -4,52 +4,52 @@
    FURNI DESIGN TOKENS  (Tailwind v4 theme)
 ───────────────────────────────────────────── */
 @theme {
-  /* ── Furni Core Palette ── */
-  --color-primary:        #3b5d50;   /* Forest Green */
-  --color-primary-light:  #5a7d6d;
-  --color-primary-dark:   #2d4a40;
-  --color-secondary:      #f9bf29;   /* Gold / Mustard */
+  --color-primary: #3b5d50;
+  --color-primary-light: #5a7d6d;
+  --color-primary-dark: #2d4a40;
+  --color-secondary: #f9bf29;
   --color-secondary-dark: #f8b810;
 
-  /* ── Neutrals ── */
-  --color-dark:    #2f2f2f;
-  --color-body:    #6a6a6a;
-  --color-light:   #dce5e4;          /* Furni light gray-green */
-  --color-lighter: #eff2f1;          /* Furni page background */
-  --color-white:   #ffffff;
+  --color-dark: #2f2f2f;
+  --color-body: #6a6a6a;
+  --color-light: #dce5e4;
+  --color-lighter: #eff2f1;
+  --color-white: #ffffff;
 
-  /* ── Semantic / UI ── */
   --color-success: #198754;
-  --color-error:   #dc3545;
+  --color-error: #dc3545;
   --color-warning: #f9bf29;
 
-  /* ── Shadows ── */
-  --shadow-xs: 0px 1px 2px 0px rgba(16,24,40,0.05);
-  --shadow-sm: 0px 1px 4px 0px rgba(0,0,0,0.20);
-  --shadow-md: 0px 4px 16px 0px rgba(0,0,0,0.12);
-  --shadow-lg: 0px 10px 32px 0px rgba(0,0,0,0.10);
+  --shadow-xs: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0px 1px 4px 0px rgba(0, 0, 0, 0.20);
+  --shadow-md: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0px 10px 32px 0px rgba(0, 0, 0, 0.10);
 
-  /* ── Layout ── */
   --max-width-10xl: 1440px;
   --radius-10: 10px;
   --radius-20: 20px;
   --radius-30: 30px;
 
-  /* ── Typography ── */
-  --font-inter:        "Inter", sans-serif;
+  --font-inter: "Inter", sans-serif;
   --font-spaceGrotesk: "Space Grotesk", sans-serif;
 }
 
 /* ─────────────────────────────────────────────
    GLOBAL RESET
 ───────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* This makes the whole page scale down gracefully when zoomed out */
+  min-width: 320px;
+}
 
 body {
   font-family: var(--font-inter);
@@ -59,6 +59,8 @@ body {
   color: var(--color-body);
   background-color: var(--color-lighter);
   overflow-x: hidden;
+  /* Prevent content from becoming unreadably small on wide screens */
+  min-width: 320px;
 }
 
 a {
@@ -66,17 +68,22 @@ a {
   text-decoration: none;
   transition: .3s all ease;
 }
-a:hover { color: var(--color-dark); opacity: .7; }
+
+a:hover {
+  color: var(--color-dark);
+  opacity: .7;
+}
 
 /* ─────────────────────────────────────────────
-   NAVBAR  (Furni: deep green + gold underline)
+   NAVBAR
 ───────────────────────────────────────────── */
 .nav {
   background: var(--color-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 5rem;
+  /* Use clamp so padding scales with viewport width */
+  padding: 1.25rem clamp(1.25rem, 5vw, 5rem);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -91,9 +98,11 @@ a:hover { color: var(--color-dark); opacity: .7; }
   text-decoration: none;
   letter-spacing: -0.5px;
 }
-.nav-logo span { opacity: 0.4; }
 
-/* Nav links */
+.nav-logo span {
+  opacity: 0.4;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -104,14 +113,13 @@ a:hover { color: var(--color-dark); opacity: .7; }
 .nav-links a {
   font-weight: 500;
   font-size: 0.9rem;
-  color: rgba(255,255,255,0.55) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
   opacity: 1;
   position: relative;
   padding-bottom: 4px;
   transition: .3s all ease;
 }
 
-/* Gold underline on hover — the Furni signature */
 .nav-links a::before {
   content: "";
   position: absolute;
@@ -124,30 +132,38 @@ a:hover { color: var(--color-dark); opacity: .7; }
   width: 0;
   transition: .15s all ease-out;
 }
+
 .nav-links a:hover,
 .nav-links a.active {
-  color: rgba(255,255,255,1) !important;
+  color: rgba(255, 255, 255, 1) !important;
 }
-.nav-links a:hover::before,
-.nav-links a.active::before { width: 100%; }
 
-/* Nav CTA icons */
+.nav-links a:hover::before,
+.nav-links a.active::before {
+  width: 100%;
+}
+
 .nav-cta {
   display: flex;
   align-items: center;
   gap: 1.25rem;
   list-style: none;
 }
+
 .nav-cta a {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
   display: flex;
   align-items: center;
   transition: .3s all ease;
 }
-.nav-cta a:hover { color: var(--color-white); opacity: 1; }
+
+.nav-cta a:hover {
+  color: var(--color-white);
+  opacity: 1;
+}
 
 /* ─────────────────────────────────────────────
-   BUTTONS  (Furni: pill shape, gold secondary)
+   BUTTONS
 ───────────────────────────────────────────── */
 .btn {
   display: inline-flex;
@@ -168,6 +184,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   color: var(--color-white);
   border-color: var(--color-dark);
 }
+
 .btn:hover {
   background: #222;
   border-color: #222;
@@ -176,76 +193,73 @@ a:hover { color: var(--color-dark); opacity: .7; }
   box-shadow: var(--shadow-md);
   opacity: 1;
 }
+
 .btn:focus-visible {
   outline: 3px solid var(--color-secondary);
   outline-offset: 2px;
 }
 
-/* Primary — forest green */
 .btn-primary {
   background: var(--color-primary);
   border-color: var(--color-primary);
 }
+
 .btn-primary:hover {
   background: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
 }
 
-/* Secondary — gold (Furni's "Shop Now" button) */
 .btn-secondary {
   color: var(--color-dark);
   background: var(--color-secondary);
   border-color: var(--color-secondary);
 }
+
 .btn-secondary:hover {
   background: var(--color-secondary-dark);
   border-color: var(--color-secondary-dark);
   color: var(--color-dark);
 }
 
-/* Ghost on dark background */
 .btn-white-outline {
   background: transparent;
-  border-color: rgba(255,255,255,0.35);
+  border-color: rgba(255, 255, 255, 0.35);
   color: var(--color-white);
 }
+
 .btn-white-outline:hover {
   border-color: var(--color-white);
   color: var(--color-white);
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-/* Small variant */
 .btn-sm {
   padding: 8px 20px;
   font-size: 0.8rem;
 }
 
 /* ─────────────────────────────────────────────
-   HERO  (Furni: dark green, white text)
+   HERO
 ───────────────────────────────────────────── */
 .hero {
   background: var(--color-primary);
-  padding: 5rem 5rem 5rem;
+  /* clamp: shrinks padding on smaller screens / zoomed-out views */
+  padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 5vw, 5rem) clamp(2.5rem, 5vw, 5rem);
   position: relative;
   overflow: visible;
 }
 
-/* Page-level split: wrap hero + stats in a div.page-top-half */
 .page-top-half {
-  background: linear-gradient(
-    to bottom,
-    var(--color-primary) 70%,
-    var(--color-lighter) 70%
-  );
+  background: linear-gradient(to bottom,
+      var(--color-primary) 70%,
+      var(--color-lighter) 70%);
 }
 
-/* Polka-dot texture */
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
@@ -256,18 +270,21 @@ a:hover { color: var(--color-dark); opacity: .7; }
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 4rem;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  /* Cap width so content doesn't stretch to the edges on ultra-wide screens */
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
 }
 
 .hero-content {
   flex: 0 0 auto;
-  max-width: 480px;
-  padding-bottom: 5rem;
+  /* Use clamp so the column shrinks gracefully when zoomed out */
+  max-width: clamp(280px, 40vw, 480px);
+  width: 100%;
+  padding-bottom: clamp(2rem, 4vw, 5rem);
 }
 
-/* Eyebrow label */
 .small-text {
   display: inline-flex;
   align-items: center;
@@ -280,31 +297,32 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-bottom: 1rem;
 }
 
-/* Force the arrow SVG to render white */
 .small-text img,
 .small-text svg {
   filter: brightness(0) invert(1);
 }
 
-/* Hero H1 */
 .head-text {
-  font-size: clamp(2.25rem, 4vw, 3.25rem);
+  /* clamp: big on large screens, readable when zoomed out */
+  font-size: clamp(1.75rem, 3.5vw, 3.25rem);
   line-height: 1.15;
   font-weight: 700;
   letter-spacing: -1px;
   color: var(--color-white);
   margin-bottom: 1.25rem;
 }
-.head-text .text-primary { color: var(--color-secondary) !important; }
+
+.head-text .text-primary {
+  color: var(--color-secondary) !important;
+}
 
 .hero-sub {
-  color: rgba(255,255,255,0.55);
-  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: clamp(0.875rem, 1.2vw, 1rem);
   line-height: 1.7;
   margin-bottom: 2rem;
 }
 
-/* Trust-badge row below searchbar */
 .trust-row {
   display: flex;
   flex-wrap: wrap;
@@ -312,98 +330,121 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-top: 1.25rem;
   list-style: none;
 }
+
 .trust-row li {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.8rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
-.trust-row li span { color: var(--color-secondary); font-weight: 700; }
 
-/* Hero visual side */
+.trust-row li span {
+  color: var(--color-secondary);
+  font-weight: 700;
+}
+
 .hero-visual {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   position: relative;
+  /* Prevent carousel from overflowing when viewport is narrow */
+  min-width: 0;
 }
 
 /* ─────────────────────────────────────────────
-   HERO CAROUSEL  (unchanged layout, Furni tones)
+   HERO CAROUSEL
 ───────────────────────────────────────────── */
 .hero-carousel {
   position: relative;
   padding: 5rem 2.5rem 1.25rem;
-  max-width: 520px;
-  height: 620px;
+  /* Scale carousel with the viewport */
+  max-width: clamp(280px, 40vw, 520px);
+  height: clamp(380px, 50vw, 620px);
   width: 100%;
-  background-color: rgba(255,255,255,0.08);
+  background-color: rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-20);
   margin: 0 auto;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(4px);
 }
 
-.carousel { display: flex; flex-direction: column-reverse; height: 620px; }
-.carousel .control-dots { position: static !important; }
+.carousel {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 100%;
+}
+
+.carousel .control-dots {
+  position: static !important;
+}
+
 .carousel .control-dots .dot {
   width: 8px !important;
   height: 8px !important;
-  background: rgba(255,255,255,0.3) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
   border-radius: 50% !important;
 }
-.carousel .control-dots .dot.selected { background: var(--color-secondary) !important; }
+
+.carousel .control-dots .dot.selected {
+  background: var(--color-secondary) !important;
+}
 
 /* ─────────────────────────────────────────────
-   STATS STRIP  (new — below hero)
+   STATS STRIP
 ───────────────────────────────────────────── */
 .stats-strip {
   background: transparent;
   border-bottom: none;
-  padding: 1.5rem 5rem 2.5rem;
+  padding: 1.5rem clamp(1.25rem, 5vw, 5rem) 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3rem;
   flex-wrap: wrap;
 }
+
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
 }
+
 .stat-item strong {
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--color-white);
   line-height: 1;
 }
+
 .stat-item span {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
 }
+
 .stats-divider {
   width: 1px;
   height: 36px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* ─────────────────────────────────────────────
-   SECTION HEADINGS  (Furni: dark, left-aligned)
+   SECTION HEADINGS
 ───────────────────────────────────────────── */
 .section-title {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
   font-weight: 700;
   color: var(--color-dark);
   margin-bottom: 0.75rem;
 }
+
 .section-sub {
   font-size: 1rem;
   color: var(--color-body);
@@ -414,6 +455,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
 .section-header {
   margin-bottom: 3rem;
 }
+
 .section-header-centered {
   text-align: center;
   display: flex;
@@ -424,9 +466,6 @@ a:hover { color: var(--color-dark); opacity: .7; }
 /* ─────────────────────────────────────────────
    SEARCHBAR
 ───────────────────────────────────────────── */
-/* ─────────────────────────────────────────────
-   SEARCHBAR — prominent white input + gold button
-───────────────────────────────────────────── */
 .searchbar-wrap {
   display: flex;
   align-items: stretch;
@@ -434,9 +473,21 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-top: 1.25rem;
   border-radius: var(--radius-10);
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.22);
-  /* outline glow so it pops against the green hero */
-  outline: 2px solid rgba(249,191,41,0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.22);
+  outline: 2px solid rgba(249, 191, 41, 0.5);
+  /* Prevent it from shrinking to nothing */
+  min-width: 0;
+  width: 100%;
+  max-width: 480px;
+  /* Glassmorphism */
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: box-shadow .3s ease;
+}
+
+.searchbar-wrap:focus-within {
+  box-shadow: 0 0 20px rgba(249, 191, 41, 0.25), 0 4px 24px rgba(0, 0, 0, 0.22);
 }
 
 .searchbar-input {
@@ -446,17 +497,19 @@ a:hover { color: var(--color-dark); opacity: .7; }
   padding: 0 1.25rem;
   border: none;
   border-radius: 0;
-  background: var(--color-white);
+  background: rgba(255, 255, 255, 0.95);
   color: var(--color-dark);
   font-family: var(--font-inter);
   font-size: 0.95rem;
   font-weight: 500;
   transition: .2s all ease;
 }
+
 .searchbar-input::placeholder {
   color: #aab;
   font-weight: 400;
 }
+
 .searchbar-input:focus {
   outline: none;
   background: #fff;
@@ -466,7 +519,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   flex-shrink: 0;
   height: 56px;
   padding: 0 1.75rem;
-  background: var(--color-secondary);   /* gold — high contrast on green */
+  background: var(--color-secondary);
   color: var(--color-dark);
   font-family: var(--font-inter);
   font-size: 0.95rem;
@@ -478,25 +531,28 @@ a:hover { color: var(--color-dark); opacity: .7; }
   letter-spacing: 0.02em;
   transition: .2s all ease;
 }
+
 .searchbar-btn:hover {
   background: var(--color-secondary-dark);
   transform: none;
 }
+
 .searchbar-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
 /* ─────────────────────────────────────────────
-   FEATURE CARDS  (Furni: icon dot, lift on hover)
+   FEATURE CARDS
 ───────────────────────────────────────────── */
 .features-section {
-  padding: 5rem;
-  background: var(--color-lighter);
+  padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 5vw, 5rem);
+  background: #f7f9f8;
 }
+
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -504,30 +560,37 @@ a:hover { color: var(--color-dark); opacity: .7; }
 
 .feature-card {
   background: var(--color-white);
-  border-radius: var(--radius-10);
+  border-radius: 16px;
   padding: 1.75rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
   transition: .3s all ease;
   position: relative;
   overflow: hidden;
 }
+
 .feature-card::after {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 3px;
   background: var(--color-secondary);
   transform: scaleX(0);
   transform-origin: left;
   transition: .3s all ease;
 }
+
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 30px rgba(249, 191, 41, 0.15);
 }
-.feature-card:hover::after { transform: scaleX(1); }
 
-/* Furni's icon dot accent */
+.feature-card:hover::after {
+  transform: scaleX(1);
+}
+
 .feature-icon {
   position: relative;
   display: inline-flex;
@@ -535,28 +598,31 @@ a:hover { color: var(--color-dark); opacity: .7; }
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: rgba(59,93,80,0.1);
+  background: rgba(59, 93, 80, 0.1);
   color: var(--color-primary);
   border-radius: var(--radius-10);
   margin-bottom: 1.25rem;
 }
+
 .feature-icon::before {
   content: "";
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(59,93,80,0.15);
+  background: rgba(59, 93, 80, 0.15);
   position: absolute;
   right: -6px;
   bottom: -4px;
   z-index: 0;
 }
+
 .feature-card h3 {
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-dark);
   margin-bottom: 0.5rem;
 }
+
 .feature-card p {
   font-size: 0.875rem;
   color: var(--color-body);
@@ -570,11 +636,10 @@ a:hover { color: var(--color-dark); opacity: .7; }
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  padding: 5rem;
+  padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 5vw, 5rem);
   background: var(--color-white);
 }
 
-/* Section header — left-aligned like Furni */
 .trending-section .section-header {
   display: flex;
   flex-direction: column;
@@ -585,15 +650,13 @@ a:hover { color: var(--color-dark); opacity: .7; }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 2.5rem 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2rem;
   list-style: none;
 }
 
 /* ─────────────────────────────────────────────
-   PRODUCT CARD  — exact Furni pattern:
-   fixed-height image area, bg rises from bottom,
-   title+price centred, dark + circle on hover
+   PRODUCT CARD
 ───────────────────────────────────────────── */
 .product-card {
   display: flex;
@@ -602,26 +665,28 @@ a:hover { color: var(--color-dark); opacity: .7; }
   text-align: center;
   text-decoration: none;
   position: relative;
-  padding-bottom: 3.25rem;   /* room for the + button */
+  padding-bottom: 3.25rem;
   cursor: pointer;
   transition: .3s all ease;
 }
 
-/* Light-green bg swells up from the bottom on hover */
 .product-card::before {
   content: "";
   position: absolute;
-  bottom: 0; left: 0; right: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: var(--color-light);
   height: 0%;
   z-index: 0;
   border-radius: var(--radius-10);
   transition: .3s all ease;
 }
-.product-card:hover::before { height: 70%; }
 
-/* Fixed-height image container — prevents tall/short images
-   from breaking the grid alignment */
+.product-card:hover::before {
+  height: 70%;
+}
+
 .product-card_img-container {
   position: relative;
   z-index: 1;
@@ -630,26 +695,29 @@ a:hover { color: var(--color-dark); opacity: .7; }
   justify-content: center;
   background: transparent;
   width: 100%;
-  height: 200px;             /* fixed height — all cards identical */
+  /* Clamp height so cards look right at all zoom levels */
+  height: clamp(140px, 18vw, 200px);
   padding: 1rem;
   transition: .3s all ease;
 }
 
-/* Whole image container lifts on hover */
+.product-card:hover {
+  box-shadow: 0 10px 30px rgba(249, 191, 41, 0.15);
+}
+
 .product-card:hover .product-card_img-container {
   transform: translateY(-22px);
 }
 
 .product-card_img {
-  max-height: 180px;
+  max-height: 90%;
   width: auto;
   max-width: 100%;
   object-fit: contain;
   transition: .3s all ease;
-  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.10));
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.10));
 }
 
-/* Text block */
 .product-card-body {
   position: relative;
   z-index: 1;
@@ -668,7 +736,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   overflow: hidden;
   white-space: normal;
   margin-bottom: 0.3rem;
-  min-height: 2.625rem;       /* reserve space for 2 lines */
+  min-height: 2.625rem;
 }
 
 .product-price {
@@ -696,8 +764,6 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-top: 0.35rem;
 }
 
-/* Dark + circle — Furni icon-cross pattern.
-   Anchored to the card bottom, slides up into view */
 .product-card-cta {
   position: absolute;
   z-index: 2;
@@ -717,13 +783,19 @@ a:hover { color: var(--color-dark); opacity: .7; }
   transition: .3s all ease;
   border: none;
   cursor: pointer;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.28);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
   font-size: 1.3rem;
   font-weight: 300;
   line-height: 1;
-  padding-bottom: 1px;       /* optical centre of + */
+  padding-bottom: 1px;
 }
-.product-card-cta svg { width: 16px; height: 16px; stroke-width: 2.5; }
+
+.product-card-cta svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
 .product-card:hover .product-card-cta {
   opacity: 1;
   visibility: visible;
@@ -739,19 +811,63 @@ a:hover { color: var(--color-dark); opacity: .7; }
   animation: shimmer 1.4s infinite;
   border-radius: var(--radius-10);
 }
+
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
+
+/* Anti-gravity float — custom ease "hangs" at top & bottom */
+@keyframes levitate {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* Staggered hero entrance — slides up from 20 px below */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .skeleton-card {
   border-radius: var(--radius-10);
   overflow: hidden;
   background: var(--color-white);
   border: 1px solid var(--color-light);
 }
-.skeleton-img   { aspect-ratio: 1; }
-.skeleton-line  { height: 14px; margin: 0.5rem 1rem; border-radius: 4px; }
-.skeleton-line.short { width: 50%; }
+
+.skeleton-img {
+  aspect-ratio: 1;
+}
+
+.skeleton-line {
+  height: 14px;
+  margin: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.skeleton-line.short {
+  width: 50%;
+}
 
 /* ─────────────────────────────────────────────
    EMPTY STATE
@@ -766,26 +882,35 @@ a:hover { color: var(--color-dark); opacity: .7; }
   align-items: center;
   gap: 1.5rem;
 }
-.empty-state svg { color: var(--color-light); }
-.empty-state h3 { color: var(--color-dark); font-size: 1.25rem; }
+
+.empty-state svg {
+  color: var(--color-light);
+}
+
+.empty-state h3 {
+  color: var(--color-dark);
+  font-size: 1.25rem;
+}
 
 /* ─────────────────────────────────────────────
-   CTA BANNER  (Furni-green, gold button)
+   CTA BANNER
 ───────────────────────────────────────────── */
 .cta-section {
   background: var(--color-primary);
-  padding: 4rem 5rem;
+  padding: clamp(2.5rem, 4vw, 4rem) clamp(1.25rem, 5vw, 5rem);
   position: relative;
   overflow: hidden;
 }
+
 .cta-section::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
   pointer-events: none;
 }
+
 .cta-inner {
   position: relative;
   z-index: 1;
@@ -797,16 +922,19 @@ a:hover { color: var(--color-dark); opacity: .7; }
   gap: 2rem;
   flex-wrap: wrap;
 }
+
 .cta-inner h2 {
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
   font-weight: 700;
   color: var(--color-white);
   margin-bottom: 0.5rem;
 }
+
 .cta-inner p {
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
   max-width: 460px;
 }
+
 .cta-actions {
   display: flex;
   gap: 1rem;
@@ -817,42 +945,47 @@ a:hover { color: var(--color-dark); opacity: .7; }
 /* ─────────────────────────────────────────────
    PRODUCT DETAIL PAGE
 ───────────────────────────────────────────── */
-
-/* Green top band — matches the home hero look */
 .product-detail-hero {
   background: var(--color-primary);
-  padding: 3rem 5rem 3.5rem;
+  padding: 3rem clamp(1.25rem, 5vw, 5rem) 3.5rem;
   position: relative;
   overflow: hidden;
 }
+
 .product-detail-hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
   pointer-events: none;
 }
+
 .product-detail-hero .product-breadcrumb {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   margin-bottom: 0.5rem;
   position: relative;
   z-index: 1;
 }
+
 .product-detail-hero .product-breadcrumb a {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
-.product-detail-hero .product-breadcrumb a:hover { color: var(--color-white); }
+
+.product-detail-hero .product-breadcrumb a:hover {
+  color: var(--color-white);
+}
+
 .product-detail-hero .product-detail-title {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(1.25rem, 3vw, 2.25rem);
   font-weight: 700;
   color: var(--color-white);
   position: relative;
   z-index: 1;
   max-width: 700px;
 }
-/* category tag above title */
+
 .product-detail-hero .product-category-tag {
   font-size: 0.75rem;
   font-weight: 600;
@@ -870,10 +1003,9 @@ a:hover { color: var(--color-dark); opacity: .7; }
   flex-direction: column;
   gap: 3rem;
   flex-wrap: wrap;
-  padding: 5rem;
+  padding: clamp(2rem, 5vw, 5rem) clamp(1.25rem, 5vw, 5rem);
 }
 
-/* Right info column — green background matching hero */
 .product-info-col {
   flex: 1;
   display: flex;
@@ -883,23 +1015,29 @@ a:hover { color: var(--color-dark); opacity: .7; }
   padding: 2rem;
   position: relative;
   overflow: hidden;
+  /* Prevent it from getting too narrow */
+  min-width: 280px;
 }
-/* dot texture on the green panel */
+
 .product-info-col::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
   pointer-events: none;
   border-radius: var(--radius-20);
 }
-.product-info-col > * { position: relative; z-index: 1; }
 
-/* Override text colours inside the green panel */
-.product-info-col .product-info {
-  border-color: rgba(255,255,255,0.15);
+.product-info-col>* {
+  position: relative;
+  z-index: 1;
 }
+
+.product-info-col .product-info {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 .product-info-col p,
 .product-info-col span,
 .product-info-col h1,
@@ -907,26 +1045,60 @@ a:hover { color: var(--color-dark); opacity: .7; }
 .product-info-col h3 {
   color: var(--color-white) !important;
 }
-.product-info-col .opacity-50 { color: rgba(255,255,255,0.45) !important; }
-.product-info-col .text-primary-orange { color: var(--color-secondary) !important; }
-.product-info-col .text-primary-green { color: #6ee77a !important; }
-/* Keep badge backgrounds readable */
-.product-info-col .product-hearts { background: rgba(255,255,255,0.12); color: var(--color-white); }
-.product-info-col .product-stars  { background: rgba(255,255,255,0.12); color: var(--color-secondary); }
-.product-info-col .product-reviews{ background: rgba(255,255,255,0.12); color: var(--color-white); }
-/* Icon buttons */
-.product-info-col .bg-white-200 { background: rgba(255,255,255,0.12) !important; }
-/* Price info cards inside green panel */
-.product-info-col .price-info_card {
-  background: rgba(255,255,255,0.1);
-  border-left-color: rgba(255,255,255,0.4);
+
+.product-info-col .opacity-50 {
+  color: rgba(255, 255, 255, 0.45) !important;
 }
-.product-info-col .price-info_card .price-label { color: rgba(255,255,255,0.6) !important; }
-.product-info-col .price-info_card .price-value { color: var(--color-white) !important; }
-/* PriceChart inside green panel */
+
+.product-info-col .text-primary-orange {
+  color: var(--color-secondary) !important;
+}
+
+.product-info-col .text-primary-green {
+  color: #6ee77a !important;
+}
+
+.product-info-col .product-hearts {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
+}
+
+.product-info-col .product-stars {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-secondary);
+}
+
+.product-info-col .product-reviews {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
+}
+
+.product-info-col .bg-white-200 {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.product-info-col .price-info_card {
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: rgba(255, 255, 255, 0.4);
+}
+
+.product-info-col .price-info_card .price-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.product-info-col .price-info_card .price-value {
+  color: var(--color-white) !important;
+}
+
 .product-info-col .recharts-wrapper,
-.product-info-col .chart-wrapper { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
-.product-info-col .recharts-cartesian-axis-tick-value { fill: rgba(255,255,255,0.5) !important; }
+.product-info-col .chart-wrapper {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.product-info-col .recharts-cartesian-axis-tick-value {
+  fill: rgba(255, 255, 255, 0.5) !important;
+}
 
 .product-image {
   flex-grow: 1;
@@ -938,6 +1110,8 @@ a:hover { color: var(--color-dark); opacity: .7; }
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Don't let image panel collapse below a readable size */
+  min-width: 280px;
 }
 
 .product-info {
@@ -961,6 +1135,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   font-weight: 500;
   color: #c0392b;
 }
+
 .product-stars {
   display: flex;
   align-items: center;
@@ -972,6 +1147,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   font-weight: 500;
   color: #92400e;
 }
+
 .product-reviews {
   display: flex;
   align-items: center;
@@ -985,32 +1161,35 @@ a:hover { color: var(--color-dark); opacity: .7; }
 }
 
 /* ─────────────────────────────────────────────
-   PRICE INFO CARD  (Furni feature card style)
+   PRICE INFO CARD
 ───────────────────────────────────────────── */
-/* Price info cards — keep white bg on the light section below */
 .price-info_card {
   flex: 1;
-  min-width: 180px;
+  min-width: 140px;
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
   border-left: 3px solid var(--color-primary);
   border-radius: 0 var(--radius-10) var(--radius-10) 0;
   background: var(--color-lighter);
-  padding: 1rem 1.25rem;
+  padding: 1.25rem;
   transition: .3s all ease;
 }
-.price-info_card:hover { box-shadow: var(--shadow-sm); }
+
+.price-info_card:hover {
+  box-shadow: var(--shadow-sm);
+}
 
 .price-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: var(--color-body);
 }
+
 .price-value {
-  font-size: 1.4rem;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
   font-weight: 800;
   color: var(--color-dark);
   line-height: 1;
@@ -1025,6 +1204,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   border-radius: var(--radius-20);
   padding: 2rem;
 }
+
 .chart-wrapper h3 {
   font-size: 1rem;
   font-weight: 700;
@@ -1033,20 +1213,21 @@ a:hover { color: var(--color-dark); opacity: .7; }
 }
 
 /* ─────────────────────────────────────────────
-   MODAL / DIALOG
+   MODAL
 ───────────────────────────────────────────── */
 .dialog-container {
   position: fixed;
   inset: 0;
   z-index: 200;
   overflow-y: auto;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
 }
+
 .dialog-content {
   background: var(--color-white);
   width: 100%;
@@ -1056,6 +1237,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   box-shadow: var(--shadow-lg);
   transition: .3s all ease;
 }
+
 .dialog-head_text {
   font-size: 1.125rem;
   font-weight: 700;
@@ -1063,6 +1245,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
+
 .dialog-input_container {
   display: flex;
   align-items: center;
@@ -1073,10 +1256,12 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-top: 1rem;
   transition: .3s all ease;
 }
+
 .dialog-input_container:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59,93,80,0.12);
+  box-shadow: 0 0 0 3px rgba(59, 93, 80, 0.12);
 }
+
 .dialog-input {
   flex: 1;
   height: 46px;
@@ -1087,7 +1272,11 @@ a:hover { color: var(--color-dark); opacity: .7; }
   color: var(--color-dark);
   outline: none;
 }
-.dialog-input::placeholder { color: var(--color-body); }
+
+.dialog-input::placeholder {
+  color: var(--color-body);
+}
+
 .dialog-btn {
   width: 100%;
   margin-top: 1.5rem;
@@ -1102,6 +1291,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   cursor: pointer;
   transition: .3s all ease;
 }
+
 .dialog-btn:hover {
   background: var(--color-primary-dark);
   transform: translateY(-1px);
@@ -1109,12 +1299,12 @@ a:hover { color: var(--color-dark); opacity: .7; }
 }
 
 /* ─────────────────────────────────────────────
-   FOOTER  (Furni: white, green logo, social dots)
+   FOOTER
 ───────────────────────────────────────────── */
 .footer-section {
   background: var(--color-white);
   border-top: 1px solid var(--color-light);
-  padding: 5rem;
+  padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 5vw, 5rem);
 }
 
 .footer-grid {
@@ -1134,7 +1324,10 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-bottom: 1rem;
   text-decoration: none;
 }
-.footer-logo span { opacity: 0.4; }
+
+.footer-logo span {
+  opacity: 0.4;
+}
 
 .footer-tagline {
   font-size: 0.875rem;
@@ -1143,13 +1336,13 @@ a:hover { color: var(--color-dark); opacity: .7; }
   margin-bottom: 1.5rem;
 }
 
-/* Newsletter form in footer */
 .footer-newsletter {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
+
 .footer-newsletter input {
   flex: 1;
   min-width: 150px;
@@ -1162,12 +1355,18 @@ a:hover { color: var(--color-dark); opacity: .7; }
   color: var(--color-dark);
   transition: .3s all ease;
 }
+
 .footer-newsletter input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59,93,80,0.1);
+  box-shadow: 0 0 0 3px rgba(59, 93, 80, 0.1);
 }
-.footer-newsletter input::placeholder { color: var(--color-body); font-size: 13px; }
+
+.footer-newsletter input::placeholder {
+  color: var(--color-body);
+  font-size: 13px;
+}
+
 .footer-newsletter button {
   height: 44px;
   padding: 0 1.25rem;
@@ -1180,14 +1379,17 @@ a:hover { color: var(--color-dark); opacity: .7; }
   cursor: pointer;
   transition: .3s all ease;
 }
-.footer-newsletter button:hover { background: var(--color-primary-dark); }
 
-/* Social icons — Furni style: circle bg, green icon */
+.footer-newsletter button:hover {
+  background: var(--color-primary-dark);
+}
+
 .footer-social {
   display: flex;
   gap: 0.5rem;
   list-style: none;
 }
+
 .footer-social a {
   width: 38px;
   height: 38px;
@@ -1200,6 +1402,7 @@ a:hover { color: var(--color-dark); opacity: .7; }
   transition: .3s all ease;
   text-decoration: none;
 }
+
 .footer-social a:hover {
   background: var(--color-primary);
   color: var(--color-white);
@@ -1207,7 +1410,6 @@ a:hover { color: var(--color-dark); opacity: .7; }
   opacity: 1;
 }
 
-/* Footer nav columns */
 .footer-col h4 {
   font-size: 0.75rem;
   font-weight: 700;
@@ -1216,16 +1418,26 @@ a:hover { color: var(--color-dark); opacity: .7; }
   color: var(--color-dark);
   margin-bottom: 1rem;
 }
-.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
 .footer-col ul a {
   font-size: 0.875rem;
   color: var(--color-body);
   text-decoration: none;
   transition: .3s all ease;
 }
-.footer-col ul a:hover { color: var(--color-primary); opacity: 1; }
 
-/* Footer bottom bar */
+.footer-col ul a:hover {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
 .footer-bottom {
   max-width: 1200px;
   margin: 0 auto;
@@ -1237,15 +1449,28 @@ a:hover { color: var(--color-dark); opacity: .7; }
   flex-wrap: wrap;
   gap: 1rem;
 }
+
 .footer-bottom p,
-.footer-bottom small { font-size: 0.8rem; color: var(--color-body); }
+.footer-bottom small {
+  font-size: 0.8rem;
+  color: var(--color-body);
+}
+
 .footer-bottom-links {
   display: flex;
   gap: 1.5rem;
   list-style: none;
 }
-.footer-bottom-links a { font-size: 0.8rem; color: var(--color-body); }
-.footer-bottom-links a:hover { color: var(--color-primary); opacity: 1; }
+
+.footer-bottom-links a {
+  font-size: 0.8rem;
+  color: var(--color-body);
+}
+
+.footer-bottom-links a:hover {
+  color: var(--color-primary);
+  opacity: 1;
+}
 
 /* ─────────────────────────────────────────────
    FORM CONTROLS
@@ -1262,30 +1487,45 @@ a:hover { color: var(--color-dark); opacity: .7; }
   background: var(--color-white);
   transition: .3s all ease;
 }
-.form-control::placeholder { font-size: 13px; color: var(--color-body); }
+
+.form-control::placeholder {
+  font-size: 13px;
+  color: var(--color-body);
+}
+
 .form-control:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59,93,80,0.1), var(--shadow-sm);
+  box-shadow: 0 0 0 3px rgba(59, 93, 80, 0.1), var(--shadow-sm);
 }
-textarea.form-control { height: auto; min-height: 130px; padding: 0.875rem 1rem; resize: vertical; }
+
+textarea.form-control {
+  height: auto;
+  min-height: 130px;
+  padding: 0.875rem 1rem;
+  resize: vertical;
+}
 
 /* ─────────────────────────────────────────────
    ACCESSIBILITY
 ───────────────────────────────────────────── */
 .visually-hidden {
   position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  clip: rect(0,0,0,0);
+  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
 }
+
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
+
 .skip-link {
   position: absolute;
   top: -100%;
@@ -1299,41 +1539,382 @@ textarea.form-control { height: auto; min-height: 130px; padding: 0.875rem 1rem;
   text-decoration: none;
   transition: top .15s ease-out;
 }
-.skip-link:focus { top: 0; }
+
+.skip-link:focus {
+  top: 0;
+}
 
 /* ─────────────────────────────────────────────
-   RESPONSIVE
+   HERO CAROUSEL — LEVITATE IMAGE + GLOW
+───────────────────────────────────────────── */
+.hero-carousel-img {
+  animation: levitate 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
+.carousel-glow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 320px;
+}
+
+.carousel-glow::before {
+  content: "";
+  position: absolute;
+  width: 65%;
+  height: 65%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249, 191, 41, 0.25) 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   STAGGERED HERO ENTRANCE
+───────────────────────────────────────────── */
+.hero-fade-up {
+  opacity: 0;
+  /* FOUC prevention */
+  animation: hero-fade-up .6s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+.hero-fade-up-1 {
+  animation-delay: 0ms;
+}
+
+.hero-fade-up-2 {
+  animation-delay: 150ms;
+}
+
+.hero-fade-up-3 {
+  animation-delay: 300ms;
+}
+
+.hero-fade-up-4 {
+  animation-delay: 450ms;
+}
+
+.hero-fade-up-5 {
+  animation-delay: 600ms;
+}
+
+/* ─────────────────────────────────────────────
+   FILTER TABS — sliding pill
+───────────────────────────────────────────── */
+.filter-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 4px;
+  background: var(--color-lighter);
+  border-radius: var(--radius-30);
+  border: 1px solid var(--color-light);
+  width: fit-content;
+}
+
+.filter-tab {
+  position: relative;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  background: transparent;
+  font-family: var(--font-inter);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-body);
+  cursor: pointer;
+  border-radius: var(--radius-30);
+  transition: color .2s ease;
+  z-index: 1;
+}
+
+.filter-tab:hover {
+  color: var(--color-dark);
+}
+
+.filter-tab.active {
+  color: var(--color-dark);
+}
+
+.filter-tab-pill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-white);
+  border-radius: var(--radius-30);
+  box-shadow: var(--shadow-xs);
+  z-index: -1;
+}
+
+.filter-tab-label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─────────────────────────────────────────────
+   SPOTLIGHT GRID
+───────────────────────────────────────────── */
+.spotlight-grid {
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────
+   STAGGERED CARD REVEAL
+───────────────────────────────────────────── */
+@keyframes card-reveal {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ACCESSIBILITY — REDUCED MOTION
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-carousel-img {
+    animation: none;
+  }
+
+  .hero-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .blob-cursor {
+    display: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE BREAKPOINTS
 ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .nav, .features-section, .trending-section,
-  .cta-section, .footer-section { padding-left: 2rem; padding-right: 2rem; }
-  .hero { padding: 4rem 2rem 0; }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Stack the product image + info panel vertically on tablets */
+  .product-image {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
-  .hero-inner { flex-direction: column; gap: 2rem; }
-  .hero-content { padding-bottom: 0; max-width: 100%; }
-  .hero-visual { width: 100%; }
-  .stats-strip { padding: 1.25rem 1.5rem; gap: 1.5rem; }
-  .stats-divider { display: none; }
-  .cta-inner { flex-direction: column; text-align: center; }
-  .cta-actions { justify-content: center; }
-  .footer-grid { grid-template-columns: 1fr; }
-  .footer-bottom { flex-direction: column; text-align: center; }
+  .hero-inner {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .hero-content {
+    padding-bottom: 0;
+    max-width: 100%;
+  }
+
+  .hero-visual {
+    width: 100%;
+  }
+
+  .stats-strip {
+    padding: 1.25rem 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .stats-divider {
+    display: none;
+  }
+
+  .cta-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cta-actions {
+    justify-content: center;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .product-image {
+    max-width: 100%;
+  }
+
+  .searchbar-wrap {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 640px) {
-  .nav { padding: 1rem 1.25rem; }
-  .nav-links { display: none; }
-  .head-text { font-size: 2rem; line-height: 1.2; }
-  .hero { padding: 2.5rem 1.25rem 0; }
-  .trending-section, .features-section,
-  .product-container { padding: 3rem 1.25rem; }
-  .products-grid { grid-template-columns: 1fr 1fr; }
-  .product-image { max-width: 100%; }
+  .nav {
+    padding: 1rem 1.25rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .head-text {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 420px) {
-  .products-grid { grid-template-columns: 1fr; }
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   PHASE 3 — CINEMATIC UI
+═══════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   TEXT REVEAL — overflow mask
+───────────────────────────────────────────── */
+.text-reveal {
+  overflow: hidden;
+}
+
+.text-reveal-line {
+  display: block;
+  overflow: hidden;
+}
+
+.text-reveal-inner {
+  display: block;
+  will-change: transform;
+}
+
+/* ─────────────────────────────────────────────
+   HORIZONTAL SCROLL SECTION
+───────────────────────────────────────────── */
+.horizontal-scroll-section {
+  height: 300vh;
+  /* scroll runway */
+  position: relative;
+}
+
+.horizontal-scroll-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 clamp(1.25rem, 5vw, 5rem);
+}
+
+.horizontal-scroll-track {
+  display: flex;
+  gap: 2rem;
+  will-change: transform;
+  padding: 2rem 0;
+}
+
+.horizontal-card {
+  flex: 0 0 clamp(260px, 22vw, 320px);
+  width: clamp(260px, 22vw, 320px);
+}
+
+.horizontal-card .product-card {
+  width: 100%;
+}
+
+.horizontal-card-img-wrap {
+  will-change: transform;
+}
+
+/* ─────────────────────────────────────────────
+   MAGNETIC CURSOR — hide native cursor on Desktop
+───────────────────────────────────────────── */
+@media (pointer: fine) {
+
+  *,
+  *::before,
+  *::after {
+    cursor: none !important;
+  }
+}
+
+.cursor-dot,
+.cursor-ring {
+  mix-blend-mode: difference;
+}
+
+/* ─────────────────────────────────────────────
+   PRODUCT PAGE — PINCER LAYOUT
+───────────────────────────────────────────── */
+.product-pincer-layout {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+.product-image-sticky {
+  position: sticky;
+  top: 6rem;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.product-skeleton-loader {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .product-pincer-layout {
+    flex-direction: column;
+  }
+
+  .product-image-sticky {
+    position: relative;
+    top: auto;
+  }
+
+  .product-skeleton-loader {
+    flex-direction: column;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   REDUCED MOTION — disable cinematic animations
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .text-reveal-inner {
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .horizontal-scroll-section {
+    height: auto;
+  }
+
+  .horizontal-scroll-sticky {
+    position: relative;
+    height: auto;
+    overflow-x: auto;
+  }
 }

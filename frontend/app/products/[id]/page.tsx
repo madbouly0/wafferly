@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getProductById } from '@/lib/api'
@@ -10,6 +11,41 @@ import PriceInfoCard from '@/components/PriceInfoCard'
 import Modal from '@/components/Modal'
 import PriceChart from '@/components/PriceChart'
 
+/* ─────────────────────────────────────────────
+   Pincer animation variants
+───────────────────────────────────────────── */
+const pincerEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
+
+const leftPanel = {
+  hidden: { x: -60, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: { duration: 0.8, ease: pincerEase, delay: 0.15 },
+  },
+}
+
+const rightPanel = {
+  hidden: { x: 60, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: { duration: 0.8, ease: pincerEase, delay: 0.15 },
+  },
+}
+
+const fadeUp = (delay: number) => ({
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: pincerEase, delay },
+  },
+})
+
+/* ─────────────────────────────────────────────
+   Product detail page
+───────────────────────────────────────────── */
 const ProductDetails = () => {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
@@ -34,7 +70,14 @@ const ProductDetails = () => {
   if (loading) {
     return (
       <div className="product-container">
-        <p className="text-xl">Loading product details...</p>
+        <div className="product-skeleton-loader">
+          <div className="skeleton" style={{ width: '100%', height: '400px', borderRadius: '16px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
+            <div className="skeleton" style={{ width: '60%', height: '24px' }} />
+            <div className="skeleton" style={{ width: '90%', height: '36px' }} />
+            <div className="skeleton" style={{ width: '40%', height: '28px' }} />
+          </div>
+        </div>
       </div>
     )
   }
@@ -51,25 +94,42 @@ const ProductDetails = () => {
   return (
     <div className="product-container">
 
-      {/* TWO-COLUMN LAYOUT */}
-      <div className="flex gap-10 xl:flex-row flex-col">
+      {/* TWO-COLUMN "PINCER" LAYOUT */}
+      <div className="product-pincer-layout" style={{ display: 'flex', alignItems: 'stretch' }}>
 
-        {/* LEFT — Product image */}
-        <div className="product-image">
+        {/* LEFT — Sticky product image */}
+        <motion.div
+          className="product-image product-image-sticky"
+          variants={leftPanel}
+          initial="hidden"
+          animate="visible"
+        >
           <Image
             src={product.image}
             alt={product.title}
             width={580}
             height={400}
             className="mx-auto object-contain"
+            style={{ mixBlendMode: 'darken' }}
           />
-        </div>
+        </motion.div>
 
-        {/* RIGHT — Green info panel (title lives here, no separate hero banner) */}
-        <div className="product-info-col">
+        {/* RIGHT — Info panel (scrolls) */}
+        <motion.div
+          className="product-info-col"
+          variants={rightPanel}
+          initial="hidden"
+          animate="visible"
+        >
 
-          {/* Title + action icons row */}
-          <div className="flex justify-between items-start gap-4 flex-wrap" style={{ marginBottom: '1.25rem' }}>
+          {/* Title + action icons */}
+          <motion.div
+            className="flex justify-between items-start gap-4 flex-wrap"
+            style={{ marginBottom: '1.25rem' }}
+            variants={fadeUp(0.4)}
+            initial="hidden"
+            animate="visible"
+          >
             <div style={{ flex: 1 }}>
               {product.category && (
                 <p style={{
@@ -102,10 +162,15 @@ const ProductDetails = () => {
                   style={{ filter: 'brightness(0) invert(1)' }} />
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Price & ratings */}
-          <div className="product-info">
+          <motion.div
+            className="product-info"
+            variants={fadeUp(0.5)}
+            initial="hidden"
+            animate="visible"
+          >
             <div className="flex flex-col gap-1">
               <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-secondary)' }}>
                 {product.currency} {product.currentPrice}
@@ -136,10 +201,15 @@ const ProductDetails = () => {
                 of buyers recommended this product
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Price info cards */}
-          <div style={{ margin: '1.5rem 0', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <motion.div
+            style={{ margin: '1.5rem 0', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}
+            variants={fadeUp(0.6)}
+            initial="hidden"
+            animate="visible"
+          >
             <PriceInfoCard
               title="Current Price"
               iconSrc="/assets/icons/price-tag.svg"
@@ -164,10 +234,15 @@ const ProductDetails = () => {
               value={`${product.currency} ${product.lowestPrice}`}
               borderColor="#3E9242"
             />
-          </div>
+          </motion.div>
 
           {/* Action buttons */}
-          <div className="flex flex-col gap-3">
+          <motion.div
+            className="flex flex-col gap-3"
+            variants={fadeUp(0.7)}
+            initial="hidden"
+            animate="visible"
+          >
             <a
               href={product.url}
               target="_blank"
@@ -188,16 +263,28 @@ const ProductDetails = () => {
                 style={{ filter: 'brightness(0) invert(1)' }} />
               <span className="text-base text-white">Track Price</span>
             </button>
-          </div>
+          </motion.div>
 
-          {/* Price chart */}
-          <PriceChart priceHistory={product.priceHistory} currency={product.currency} />
+          {/* Price chart (scrolls with right column) */}
+          <motion.div
+            variants={fadeUp(0.8)}
+            initial="hidden"
+            animate="visible"
+          >
+            <PriceChart priceHistory={product.priceHistory} currency={product.currency} />
+          </motion.div>
 
-        </div>
+        </motion.div>
       </div>
 
       {/* DESCRIPTION */}
-      <div className="flex flex-col gap-5">
+      <motion.div
+        className="flex flex-col gap-5"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+      >
         <h3 className="text-2xl font-semibold" style={{ color: 'var(--color-dark)' }}>
           Product Description
         </h3>
@@ -210,7 +297,7 @@ const ProductDetails = () => {
             <p className="text-base text-gray-500">No description available for this product.</p>
           )}
         </div>
-      </div>
+      </motion.div>
 
       <Modal productId={product.id} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 

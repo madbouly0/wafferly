@@ -1,0 +1,18 @@
+.spotlight-card {
+    position: relative;
+    border-radius: var(--radius-10, 10px);
+    overflow: hidden;
+}
+
+.spotlight-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(250px circle at var(--mouse-x, -999px) var(--mouse-y, -999px),
+            var(--spotlight-color, transparent),
+            transparent 80%);
+    pointer-events: none;
+    z-index: 3;
+    transition: opacity .2s ease;
+}
