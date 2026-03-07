@@ -45,7 +45,7 @@ const ProductCard = ({ product }: Props) => {
                 fontWeight: 700,
                 padding: '2px 7px',
                 borderRadius: '20px',
-                zIndex: 2,
+                zIndex: 10,
               }}
             >
               -{discountPct}%
