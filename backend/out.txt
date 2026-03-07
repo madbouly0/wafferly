@@ -1,0 +1,19 @@
+=== SCHEMA product_subscribers ===
+('id', 'int', 'NO')
+('product_id', 'int', 'NO')
+('email', 'nvarchar', 'NO')
+('subscribed_at', 'datetime', 'YES')
+('target_price', 'decimal', 'YES')
+('unsubscribe_token', 'varchar', 'NO')
+
+=== PRICE HISTORY (Top 10) ===
+(32, 14, Decimal('49.99'), datetime.datetime(2026, 3, 7, 19, 39, 42, 627000))
+(31, 13, Decimal('1052.00'), datetime.datetime(2026, 3, 7, 19, 39, 41, 663000))
+(30, 12, Decimal('1314.00'), datetime.datetime(2026, 3, 7, 19, 39, 35, 320000))
+(29, 11, Decimal('1151.68'), datetime.datetime(2026, 3, 7, 19, 39, 31, 927000))
+(28, 10, Decimal('1654.00'), datetime.datetime(2026, 3, 7, 19, 39, 28, 163000))
+(27, 9, Decimal('1654.00'), datetime.datetime(2026, 3, 7, 19, 39, 21, 797000))
+(26, 8, Decimal('1002.00'), datetime.datetime(2026, 3, 7, 19, 39, 15, 700000))
+(25, 7, Decimal('450.75'), datetime.datetime(2026, 3, 7, 19, 39, 6, 413000))
+(24, 6, Decimal('450.75'), datetime.datetime(2026, 3, 7, 19, 39, 3, 807000))
+(23, 5, Decimal('500.88'), datetime.datetime(2026, 3, 7, 19, 39, 0, 617000))

@@ -186,19 +186,21 @@ const ProductDetails = () => {
           <div className="mt-4 mb-2 border-b border-gray-100 pb-6">
             <div className="flex items-baseline gap-3">
               <span className="text-4xl font-extrabold text-[#111]">
-                {product.currency} {product.currentPrice.toLocaleString()}
+                {product.currency} {product.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
-              <span className="text-lg text-gray-400 line-through">
-                {product.currency} {product.originalPrice.toLocaleString()}
-              </span>
+              {product.originalPrice > product.currentPrice && (
+                <span className="text-lg text-gray-400 line-through">
+                  {product.currency} {product.originalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              )}
             </div>
 
-            {product.highestPrice && product.currentPrice < product.highestPrice ? (
+            {(product.highestPrice || product.currentPrice) > product.currentPrice ? (
               <div className="price-trend-badge down">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                {Math.round(((product.highestPrice - product.currentPrice) / product.highestPrice) * 100)}% from highest
+                {Math.round((((product.highestPrice || product.currentPrice) - product.currentPrice) / (product.highestPrice || product.currentPrice)) * 100)}% from highest
               </div>
-            ) : product.currentPrice > product.averagePrice ? (
+            ) : product.currentPrice > (product.averagePrice || product.currentPrice) ? (
               <div className="price-trend-badge up">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                 Trending UP
@@ -210,13 +212,15 @@ const ProductDetails = () => {
             )}
 
             <div className="flex items-center gap-4 mt-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <Image src="/assets/icons/star.svg" alt="star" width={16} height={16} />
-                <span className="font-bold text-gray-900">{product.stars}</span>
-              </div>
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <span>{product.reviewsCount} Reviews</span>
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+              {product.stars ? (
+                <div className="flex items-center gap-1">
+                  <Image src="/assets/icons/star.svg" alt="star" width={16} height={16} />
+                  <span className="font-bold text-gray-900">{product.stars}</span>
+                </div>
+              ) : null}
+              {product.stars && product.reviewsCount ? <div className="w-1 h-1 bg-gray-300 rounded-full"></div> : null}
+              {product.reviewsCount ? <span>{product.reviewsCount.toLocaleString()} Reviews</span> : null}
+              {product.reviewsCount ? <div className="w-1 h-1 bg-gray-300 rounded-full"></div> : null}
               <span className="text-green-600 font-medium">93% recommend</span>
             </div>
           </div>
@@ -229,7 +233,7 @@ const ProductDetails = () => {
                 Current Price
               </div>
               <div className="text-base font-bold text-gray-900 text-lg">
-                {product.currency} {product.currentPrice.toLocaleString()}
+                {product.currency} {product.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
             <div className="stat-box" style={{ borderLeftColor: '#9CA3AF', animationDelay: '0.2s' }}>
@@ -238,7 +242,7 @@ const ProductDetails = () => {
                 Average Price
               </div>
               <div className="text-base font-bold text-gray-900 text-lg">
-                {product.currency} {product.averagePrice.toLocaleString()}
+                {product.currency} {(product.averagePrice || product.currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
             <div className="stat-box" style={{ borderLeftColor: '#EF4444', animationDelay: '0.3s' }}>
@@ -247,7 +251,7 @@ const ProductDetails = () => {
                 Highest Price
               </div>
               <div className="text-base font-bold text-gray-900 text-lg">
-                {product.currency} {product.highestPrice.toLocaleString()}
+                {product.currency} {(product.highestPrice || product.currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
             <div className="stat-box" style={{ borderLeftColor: '#22C55E', animationDelay: '0.4s' }}>
@@ -256,7 +260,7 @@ const ProductDetails = () => {
                 Lowest Price
               </div>
               <div className="text-base font-bold text-gray-900 text-lg">
-                {product.currency} {product.lowestPrice.toLocaleString()}
+                {product.currency} {(product.lowestPrice || product.currentPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
           </div>
@@ -290,10 +294,10 @@ const ProductDetails = () => {
         transition={{ duration: 0.6 }}
       >
         <PriceChart priceHistory={product.priceHistory} currency={product.currency} />
-      </motion.div>
+      </motion.div >
 
       {/* BOTTOM SECTION: Tabs */}
-      <motion.div
+      < motion.div
         className="mt-8 bg-white border border-gray-200 rounded-2xl p-6 lg:p-10"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -366,11 +370,11 @@ const ProductDetails = () => {
             </motion.div>
           )}
         </div>
-      </motion.div>
+      </motion.div >
 
       <Modal productId={product.id} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-    </div>
+    </div >
   )
 }
 

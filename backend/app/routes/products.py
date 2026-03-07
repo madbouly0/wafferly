@@ -74,6 +74,9 @@ def scrape_product():
 
         if not scraped:
             return jsonify({"error": "Failed to scrape product. Please check the URL."}), 500
+            
+        if "error" in scraped:
+            return jsonify({"error": scraped["error"]}), 500
 
         if existing_product:
             # Update the existing product with fresh data
