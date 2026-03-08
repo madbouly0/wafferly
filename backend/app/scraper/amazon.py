@@ -8,40 +8,128 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import re
 import json
+import random
+import time
+
+
+# Rotate between realistic user agents to avoid fingerprinting
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+]
+
+# Realistic screen sizes to avoid headless detection
+WINDOW_SIZES = [
+    "1920,1080",
+    "1366,768",
+    "1440,900",
+    "1536,864",
+    "1280,800",
+]
 
 
 def get_chrome_driver():
-    # Set up Chrome to run in the background (headless = no visible window)
     options = Options()
-    options.add_argument("--headless")
+
+    # Use the new headless mode — harder to detect than the old --headless flag
+    options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1920,1080")
 
-    # Pretend to be a real browser so Amazon doesn't block us
-    options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/122.0.0.0 Safari/537.36"
-    )
+    # Random window size to avoid fingerprinting
+    options.add_argument(f"--window-size={random.choice(WINDOW_SIZES)}")
+
+    # Rotate user agent
+    user_agent = random.choice(USER_AGENTS)
+    options.add_argument(f"--user-agent={user_agent}")
+
+    # Remove the "Chrome is controlled by automated software" banner
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option("useAutomationExtension", False)
+
+    # Disable Blink features that expose headless/automation
+    options.add_argument("--disable-blink-features=AutomationControlled")
+
+    # Realistic language settings
+    options.add_argument("--lang=en-US,en;q=0.9")
+
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-plugins-discovery")
+    options.add_argument("--disable-infobars")
+    options.add_argument("--disable-notifications")
 
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
+
+    # Patch navigator.webdriver to undefined via CDP
+    # This is the primary signal Amazon uses to detect headless browsers
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+        "source": """
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            });
+            Object.defineProperty(navigator, 'plugins', {
+                get: () => [1, 2, 3, 4, 5]
+            });
+            Object.defineProperty(navigator, 'languages', {
+                get: () => ['en-US', 'en']
+            });
+            window.chrome = {
+                runtime: {}
+            };
+        """
+    })
+
     return driver
+
+
+def is_bot_detection_page(soup):
+    """
+    Check if Amazon has served a CAPTCHA or bot-detection page
+    instead of the actual product.
+    """
+    page_text = soup.get_text().lower()
+
+    bot_signals = [
+        "enter the characters you see below",
+        "sorry, we just need to make sure you're not a robot",
+        "type the characters you see in this image",
+        "to discuss automated access to amazon data",
+        "api.amazon.com",
+        "captcha",
+    ]
+
+    for signal in bot_signals:
+        if signal in page_text:
+            return True
+
+    title_tag = soup.find("title")
+    if title_tag:
+        title_text = title_tag.get_text().lower()
+        if "robot check" in title_text or "captcha" in title_text:
+            return True
+
+    return False
+
+
+def human_delay(min_sec=1.5, max_sec=4.0):
+    """Sleep for a random duration to simulate human browsing behaviour."""
+    time.sleep(random.uniform(min_sec, max_sec))
 
 
 def extract_price(*text_values):
     """
-    Try each text value one by one and return the first valid price we find.
-    We strip out everything except digits and dots.
+    Try each text value one by one and return the first valid price found.
     """
     for text in text_values:
         if text:
-            # Remove everything that is not a digit or a dot
             cleaned = re.sub(r'[^\d.]', '', text.strip())
             if cleaned:
-                # Find the first number like "19.99" or "19"
                 match = re.search(r'\d+\.?\d{0,2}', cleaned)
                 if match:
                     return match.group()
@@ -51,7 +139,6 @@ def extract_price(*text_values):
 def extract_description(soup):
     """
     Try a few different CSS selectors to find the product description.
-    Return the first one that has actual text.
     """
     selectors = [
         "#feature-bullets .a-list-item",
@@ -62,14 +149,11 @@ def extract_description(soup):
     for selector in selectors:
         elements = soup.select(selector)
         if elements:
-            # Get the text from each element
             lines = []
             for el in elements:
                 text = el.get_text(strip=True)
-                # Skip empty lines or very short ones
                 if text and len(text) > 5:
                     lines.append(text)
-
             if lines:
                 return "\n".join(lines)
 
@@ -79,7 +163,7 @@ def extract_description(soup):
 def scrape_amazon_product(url):
     """
     Visit an Amazon product page and pull out all the info we need.
-    Returns a dictionary with the product data, or None if something goes wrong.
+    Returns a dictionary with product data, or None if something goes wrong.
     """
     if not url:
         return None
@@ -87,76 +171,76 @@ def scrape_amazon_product(url):
     driver = None
 
     try:
-        # Try with requests first to avoid Selenium overhead/crashes
-        import requests
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "Accept-Language": "en-US,en;q=0.9",
-        }
-        resp = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(resp.text, 'html.parser')
+        driver = get_chrome_driver()
+
+        # Pre-navigation delay (simulates human typing/clicking)
+        human_delay(0.5, 1.5)
+
+        driver.get(url)
+
+        # Wait for either a real product or a CAPTCHA to appear
+        try:
+            WebDriverWait(driver, 20).until(
+                lambda d: d.find_elements(By.ID, "productTitle") or
+                          d.find_elements(By.ID, "captchacharacters") or
+                          d.find_elements(By.CSS_SELECTOR, "form[action='/errors/validateCaptcha']")
+            )
+        except Exception:
+            # Neither appeared in time — wait a bit more and try to parse anyway
+            human_delay(3, 5)
+
+        # Simulate human reading/thinking time after page load
+        human_delay(1.5, 3.0)
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+        # --- Bot detection check with one retry ---
+        if is_bot_detection_page(soup):
+            print(f"  ⚠️  Bot detection triggered. Waiting before retry...")
+            human_delay(10, 20)
+            driver.refresh()
+            human_delay(5, 10)
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+            if is_bot_detection_page(soup):
+                print("  ❌  Still blocked after retry. Skipping.")
+                return None
+
+        # --- Product title (also a sanity check) ---
         title_element = soup.select_one("#productTitle")
         title = title_element.get_text(strip=True) if title_element else ""
-        
-        if not title:
-            # Return Mock Data to allow DB insertion testing without Amazon blocking us
-            return {
-                "url": url,
-                "currency": "$",
-                "image": "https://m.media-amazon.com/images/I/71o8Q5XJS5L._AC_SX679_.jpg",
-                "title": "Mock Product Passed Amazon Bot Detection",
-                "currentPrice": 49.99,
-                "originalPrice": 59.99,
-                "priceHistory": [],
-                "discountRate": 20,
-                "category": "Electronics",
-                "reviewsCount": 1500,
-                "stars": 4.5,
-                "isOutOfStock": False,
-                "description": "This is a mock description because Amazon blocked the scraper.",
-                "lowestPrice": 49.99,
-                "highestPrice": 59.99,
-                "averagePrice": 54.99,
-            }
 
-        # --- Get the current price ---
-        # Amazon shows prices in a few different places depending on the page layout
+        if not title or len(title) < 3:
+            print(f"  ⚠️  No product title found — likely blocked or bad URL")
+            return None
+
+        # --- Current price ---
         price_element_1 = soup.select_one(".priceToPay .a-price-whole")
         price_element_2 = soup.select_one(".a-price .a-offscreen")
         price_element_3 = soup.select_one("#priceblock_ourprice")
         price_element_4 = soup.select_one(".a-button-selected .a-color-base")
 
-        current_price_text_1 = price_element_1.get_text(strip=True) if price_element_1 else ''
-        current_price_text_2 = price_element_2.get_text(strip=True) if price_element_2 else ''
-        current_price_text_3 = price_element_3.get_text(strip=True) if price_element_3 else ''
-        current_price_text_4 = price_element_4.get_text(strip=True) if price_element_4 else ''
-
         current_price = extract_price(
-            current_price_text_1,
-            current_price_text_2,
-            current_price_text_3,
-            current_price_text_4,
+            price_element_1.get_text(strip=True) if price_element_1 else '',
+            price_element_2.get_text(strip=True) if price_element_2 else '',
+            price_element_3.get_text(strip=True) if price_element_3 else '',
+            price_element_4.get_text(strip=True) if price_element_4 else '',
         )
 
-        # --- Get the original (before sale) price ---
+        # --- Original price ---
         orig_element_1 = soup.select_one(".a-price.a-text-price .a-offscreen")
         orig_element_2 = soup.select_one("#listPrice")
         orig_element_3 = soup.select_one("#priceblock_dealprice")
         orig_element_4 = soup.select_one(".a-size-base.a-color-price")
 
-        orig_price_text_1 = orig_element_1.get_text(strip=True) if orig_element_1 else ''
-        orig_price_text_2 = orig_element_2.get_text(strip=True) if orig_element_2 else ''
-        orig_price_text_3 = orig_element_3.get_text(strip=True) if orig_element_3 else ''
-        orig_price_text_4 = orig_element_4.get_text(strip=True) if orig_element_4 else ''
-
         original_price = extract_price(
-            orig_price_text_1,
-            orig_price_text_2,
-            orig_price_text_3,
-            orig_price_text_4,
+            orig_element_1.get_text(strip=True) if orig_element_1 else '',
+            orig_element_2.get_text(strip=True) if orig_element_2 else '',
+            orig_element_3.get_text(strip=True) if orig_element_3 else '',
+            orig_element_4.get_text(strip=True) if orig_element_4 else '',
         )
 
-        # --- Check if the item is out of stock ---
+        # --- Availability ---
         availability_element = soup.select_one("#availability span")
         out_of_stock = False
         if availability_element:
@@ -164,41 +248,34 @@ def scrape_amazon_product(url):
             if "currently unavailable" in availability_text:
                 out_of_stock = True
 
-        # --- Get the product image URL ---
+        # --- Product image ---
         image_url = ""
         img_element = soup.select_one("#imgBlkFront") or soup.select_one("#landingImage")
-
         if img_element:
-            # Amazon stores multiple image sizes in a JSON string on the element
             dynamic_images_json = img_element.get("data-a-dynamic-image", "{}")
             try:
                 image_urls = list(json.loads(dynamic_images_json).keys())
                 if image_urls:
                     image_url = image_urls[0]
             except json.JSONDecodeError:
-                # If JSON parsing fails, just grab the regular src attribute
                 image_url = img_element.get("src", "")
 
-        # --- Get the currency symbol ---
+        # --- Currency ---
         currency_element = soup.select_one(".a-price-symbol")
-        if currency_element:
-            currency = currency_element.get_text(strip=True)[:1]
-        else:
-            currency = "$"
+        currency = currency_element.get_text(strip=True)[:1] if currency_element else "₹"
 
-        # --- Get the discount percentage ---
+        # --- Discount ---
         discount_rate = 0
         discount_element = soup.select_one(".savingsPercentage")
         if discount_element:
-            # Remove the minus sign and percent sign, then convert to a number
             discount_text = re.sub(r'[-%]', '', discount_element.get_text(strip=True))
             if discount_text.isdigit():
                 discount_rate = int(discount_text)
 
-        # --- Get the product description ---
+        # --- Description ---
         description = extract_description(soup)
 
-        # --- Get the star rating ---
+        # --- Stars ---
         stars = 0
         stars_element = soup.select_one("#acrPopover .a-icon-alt")
         if stars_element:
@@ -206,27 +283,24 @@ def scrape_amazon_product(url):
             if stars_match:
                 stars = float(stars_match.group())
 
-        # --- Get the number of reviews ---
+        # --- Review count ---
         reviews_count = 0
         reviews_element = soup.select_one("#acrCustomerReviewText")
         if reviews_element:
             reviews_match = re.search(r'[\d,]+', reviews_element.get_text(strip=True))
             if reviews_match:
-                # Remove commas before converting to int (e.g. "1,234" -> 1234)
                 reviews_count = int(reviews_match.group().replace(',', ''))
 
-        # Convert prices to floats (or 0 if we couldn't find them)
         cp = float(current_price) if current_price else 0
         op = float(original_price) if original_price else 0
 
-        # Build the final data dictionary
-        product_data = {
+        return {
             "url": url,
-            "currency": currency or "$",
+            "currency": currency or "₹",
             "image": image_url,
             "title": title,
-            "currentPrice": cp or op,      # Fall back to original price if no current price
-            "originalPrice": op or cp,     # Fall back to current price if no original price
+            "currentPrice": cp or op,
+            "originalPrice": op or cp,
             "priceHistory": [],
             "discountRate": discount_rate,
             "category": "category",
@@ -239,13 +313,10 @@ def scrape_amazon_product(url):
             "averagePrice": cp or op,
         }
 
-        return product_data
-
     except Exception as e:
         print(f"Error scraping product: {e}")
-        return {"error": str(e)}
+        return None
 
     finally:
-        # Always close the browser, even if something went wrong
         if driver:
             driver.quit()
