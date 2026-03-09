@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wafferly - Create Account</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Exact Design Tokens */
+        :root {
+            --color-primary: #3b5d50;
+            --color-primary-light: #5a7d6d;
+            --color-primary-dark: #2d4a40;
+            --color-secondary: #f9bf29;
+            --color-secondary-dark: #f8b810;
+            --color-white: #ffffff;
+            --color-error: #dc3545;
+            --radius-10: 10px;
+            --radius-20: 20px;
+            --radius-30: 30px;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-primary);
+            font-family: var(--font-body);
+            color: var(--color-white);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background Layer */
+        .universe {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .universe::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 120% 80% at 80% 50%, #2d4a40 0%, transparent 55%),
+                radial-gradient(ellipse 80% 100% at 20% 30%, #4a7060 0%, transparent 50%),
+                radial-gradient(ellipse 60% 60% at 40% 90%, #2a4538 0%, transparent 45%);
+            background-color: var(--color-primary);
+        }
+
+        .universe::after {
+            content: "";
+            position: absolute;
+            inset: -100px;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.04) 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+            animation: driftGrid 40s linear infinite;
+        }
+
+        @keyframes driftGrid {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(28px, 28px);
+            }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            top: -10%;
+            right: -10%;
+            background: rgba(59, 93, 80, 0.5);
+            animation: moveOrb1 22s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -5%;
+            left: -5%;
+            background: rgba(249, 191, 41, 0.18);
+            animation: moveOrb2 18s ease-in-out infinite alternate-reverse;
+        }
+
+        .orb-3 {
+            width: 280px;
+            height: 280px;
+            top: 40%;
+            left: 10%;
+            background: rgba(59, 93, 80, 0.25);
+            animation: moveOrb3 26s linear infinite;
+        }
+
+        .orb-4 {
+            width: 180px;
+            height: 180px;
+            top: 50%;
+            right: 40%;
+            background: rgba(249, 191, 41, 0.1);
+            animation: moveOrb4 14s ease-in-out infinite alternate;
+        }
+
+        @keyframes moveOrb1 {
+            from {
+                transform: translate(0, 0) scale(0.97);
+            }
+
+            to {
+                transform: translate(40px, 40px) scale(1.05);
+            }
+        }
+
+        @keyframes moveOrb2 {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(50px, -50px);
+            }
+        }
+
+        @keyframes moveOrb3 {
+            from {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            to {
+                transform: translate(30px, 30px) rotate(180deg);
+            }
+        }
+
+        @keyframes moveOrb4 {
+            from {
+                transform: translate(0, 0) scale(0.97);
+            }
+
+            to {
+                transform: translate(-40px, -40px) scale(1.05);
+            }
+        }
+
+        /* Layout */
+        #layout-container {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 45% 55%;
+            max-width: 1280px;
+            width: 100%;
+            height: 100vh;
+            padding: 32px 40px;
+            gap: 32px;
+            align-items: center;
+        }
+
+        /* Left Panel - Form Card */
+        .left-col {
+            opacity: 0;
+            animation: slideLeft 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        @keyframes slideLeft {
+            from {
+                transform: translateX(-40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .form-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 36px 38px;
+            max-width: 440px;
+            width: 100%;
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(59, 93, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: levitate 9s ease-in-out infinite;
+        }
+
+        @keyframes levitate {
+            0% {
+                transform: translateY(0);
+            }
+
+            45% {
+                transform: translateY(-8px);
+            }
+
+            75% {
+                transform: translateY(5px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .form-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #f9bf29, transparent);
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #f9bf29;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.3s;
+        }
+
+        .eyebrow-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #f9bf29;
+            box-shadow: 0 0 8px rgba(249, 191, 41, 0.8);
+        }
+
+        .form-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--color-white);
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.35s;
+        }
+
+        .form-sub {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.35s;
+        }
+
+        .error-banner {
+            display: none;
+            background: rgba(220, 53, 69, 0.12);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 10px;
+            color: #ff8080;
+            font-size: 0.82rem;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 14px;
+            opacity: 0;
+        }
+
+        #fg-name {
+            animation: fadeUp 0.6s ease forwards 0.44s;
+        }
+
+        #fg-email {
+            animation: fadeUp 0.6s ease forwards 0.48s;
+        }
+
+        #fg-password {
+            animation: fadeUp 0.6s ease forwards 0.52s;
+        }
+
+        #fg-confirm {
+            animation: fadeUp 0.6s ease forwards 0.56s;
+        }
+
+        .name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            color: var(--color-white);
+            padding: 0 16px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-input:focus {
+            border-color: rgba(249, 191, 41, 0.5);
+            box-shadow: 0 0 0 3px rgba(249, 191, 41, 0.12), 0 0 20px rgba(249, 191, 41, 0.08);
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 22px;
+            right: 16px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #f9bf29;
+        }
+
+        .pwd-strength-container {
+            margin-top: 6px;
+            padding: 0 4px;
+        }
+
+        .pwd-strength-bar {
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .pwd-strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .pwd-strength-label {
+            font-size: 0.68rem;
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+            transition: color 0.3s ease;
+        }
+
+        .terms-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            margin-top: 6px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.6s;
+        }
+
+        .terms-row input[type="checkbox"] {
+            margin-top: 4px;
+            accent-color: #f9bf29;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .terms-label {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.76rem;
+            line-height: 1.4;
+        }
+
+        .terms-label a {
+            color: rgba(249, 191, 41, 0.7);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .terms-label a:hover {
+            color: #f9bf29;
+        }
+
+        .btn {
+            height: 50px;
+            width: 100%;
+            border-radius: 30px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: #f9bf29;
+            color: #2f2f2f;
+            border: none;
+            box-shadow: 0 4px 24px rgba(249, 191, 41, 0.35);
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.64s;
+        }
+
+        .btn-primary:hover {
+            background: #f8b810;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(249, 191, 41, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 0.85rem;
+            margin: 20px 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.68s;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .divider::before {
+            margin-right: 12px;
+        }
+
+        .divider::after {
+            margin-left: 12px;
+        }
+
+        .btn-google {
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            height: 46px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.72s;
+            border-radius: 30px;
+        }
+
+        .btn-google:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.76s;
+        }
+
+        .login-link a {
+            color: rgba(249, 191, 41, 0.8);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            color: #f9bf29;
+        }
+
+        /* Right Panel - Content */
+        .right-col {
+            position: relative;
+            opacity: 0;
+            animation: slideRight 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
+            padding-left: 20px;
+        }
+
+        @keyframes slideRight {
+            from {
+                transform: translateX(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-white);
+            letter-spacing: -0.5px;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.1s;
+        }
+
+        .logo span {
+            opacity: 0.4;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 2.8vw, 2.8rem);
+            font-weight: 700;
+            color: var(--color-white);
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.2s;
+        }
+
+        h1 .highlight {
+            color: #f9bf29;
+        }
+
+        .subtext {
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.45);
+            max-width: 360px;
+            line-height: 1.5;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.3s;
+        }
+
+        /* Cars Cluster */
+        .cards-cluster {
+            position: relative;
+            height: 260px;
+            width: 100%;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.4s;
+        }
+
+        .glass-card {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Card 1 */
+        .card-1 {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            width: 260px;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            animation: driftCard1 8s ease-in-out infinite;
+        }
+
+        @keyframes driftCard1 {
+            0% {
+                transform: translateY(0) rotate(0);
+            }
+
+            50% {
+                transform: translateY(-14px) rotate(-0.5deg);
+            }
+
+            75% {
+                transform: translateY(8px) rotate(0.3deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(0);
+            }
+        }
+
+        .card-1 .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .card-1 .big-amount {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #f9bf29;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .card-1 .amount-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .mini-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mini-row {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 6px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mini-row .name {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .mini-row .save-badge {
+            font-size: 10px;
+            font-weight: 700;
+            color: #f9bf29;
+            background: rgba(249, 191, 41, 0.12);
+            border-radius: 20px;
+            padding: 2px 7px;
+        }
+
+        /* Card 2 */
+        .card-2 {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            width: 185px;
+            padding: 14px 16px;
+            background: rgba(59, 93, 80, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: driftCard2 11s ease-in-out infinite;
+        }
+
+        @keyframes driftCard2 {
+            0% {
+                transform: translateY(0) rotate(-1.5deg);
+            }
+
+            50% {
+                transform: translateY(-18px) rotate(-2.5deg);
+            }
+
+            75% {
+                transform: translateY(18px) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(-1.5deg);
+            }
+        }
+
+        .card-2 .top-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .card-2 .icon-box {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(249, 191, 41, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .card-2 .title-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-2 .notif-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-white);
+        }
+
+        .card-2 .notif-time {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .card-2 .notif-body {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.4;
+        }
+
+        .card-2 .notif-body .highlight {
+            color: #f9bf29;
+            font-weight: 700;
+        }
+
+        /* Card 3 */
+        .card-3 {
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+            left: auto;
+            padding: 9px 16px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: driftCard3 13s ease-in-out infinite alternate;
+        }
+
+        @keyframes driftCard3 {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(12px, -8px);
+            }
+
+            100% {
+                transform: translate(-8px, 12px);
+            }
+        }
+
+        .avatars {
+            display: flex;
+        }
+
+        .avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            margin-right: -6px;
+            border: 1px solid #3b5d50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .avatar:last-child {
+            margin-right: 0;
+        }
+
+        .av-1 {
+            background: #E57373;
+            z-index: 4;
+        }
+
+        .av-2 {
+            background: #81C784;
+            z-index: 3;
+        }
+
+        .av-3 {
+            background: #64B5F6;
+            z-index: 2;
+        }
+
+        .av-4 {
+            background: #BA68C8;
+            z-index: 1;
+        }
+
+        .card-3 span {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .card-3 .highlight {
+            color: #f9bf29;
+            font-weight: 600;
+        }
+
+        /* Perks List */
+        .perks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.5s;
+        }
+
+        .perk-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .perk-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: rgba(249, 191, 41, 0.1);
+            border: 1px solid rgba(249, 191, 41, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .perk-text {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.4;
+        }
+
+        .perk-text span {
+            color: var(--color-white);
+            font-weight: 600;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            #layout-container {
+                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                height: 100%;
+                padding: 40px 20px;
+                gap: 60px;
+            }
+
+            body {
+                overflow: auto;
+                min-height: 100vh;
+                height: auto;
+                align-items: flex-start;
+            }
+
+            .left-col {
+                justify-content: center;
+                order: 2;
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+
+            .right-col {
+                order: 1;
+                padding-left: 0;
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="universe">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+    <div id="layout-container">
+
+        <!-- Left Side: Form -->
+        <div class="left-col">
+            <div class="form-card">
+                <div class="eyebrow">
+                    <div class="eyebrow-dot"></div>START SAVING TODAY
+                </div>
+                <h2 class="form-title">Create account</h2>
+                <div class="form-sub">Free forever. No credit card needed.</div>
+
+                <div class="error-banner" id="errorBanner"></div>
+
+                <form id="registerForm">
+                    <div class="form-group name-row" id="fg-name">
+                        <input type="text" id="firstName" class="form-input" placeholder="First Name (e.g. Arjun)"
+                            required>
+                        <input type="text" id="lastName" class="form-input" placeholder="Last Name (e.g. Sharma)"
+                            required>
+                    </div>
+                    <div class="form-group" id="fg-email">
+                        <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group" id="fg-password">
+                        <div style="position: relative;">
+                            <input type="password" id="password" class="form-input" placeholder="Password" required>
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="pwd-strength-container">
+                            <div class="pwd-strength-bar">
+                                <div class="pwd-strength-fill" id="pwdFill"></div>
+                            </div>
+                            <span class="pwd-strength-label" id="pwdLabel"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="fg-confirm">
+                        <div style="position: relative;">
+                            <input type="password" id="confirmPassword" class="form-input"
+                                placeholder="Confirm Password" required>
+                            <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="terms-row">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms" class="terms-label">
+                            I agree to Wafferly's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Create my free account</button>
+                </form>
+                <div class="divider">or</div>
+                <button type="button" class="btn btn-google">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4" />
+                        <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853" />
+                        <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            fill="#FBBC05" />
+                        <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335" />
+                    </svg>
+                    Continue with Google
+                </button>
+                <div class="login-link">Already have an account? <a href="#">Sign in &rarr;</a></div>
+            </div>
+        </div>
+
+        <!-- Right Side: Perks & Content -->
+        <div class="right-col">
+            <div class="logo">Wafferly<span>.</span></div>
+            <h1>Join <span class="highlight">12,000+</span><br>smart shoppers.</h1>
+            <p class="subtext">Wafferly automates price tracking for your wishlist so you never miss a sale again.</p>
+            <div class="cards-cluster">
+                <div class="card-1 glass-card">
+                    <div class="label">TOTAL SAVED THIS MONTH</div>
+                    <div class="big-amount">₹4.2L</div>
+                    <div class="amount-sub">across all Wafferly users</div>
+                    <div class="mini-rows">
+                        <div class="mini-row"><span class="name">Samsung 65" TV</span><span class="save-badge">saved
+                                ₹8,400</span></div>
+                        <div class="mini-row"><span class="name">iPad Air M2</span><span class="save-badge">saved
+                                ₹5,200</span></div>
+                        <div class="mini-row"><span class="name">Dyson V15</span><span class="save-badge">saved
+                                ₹3,700</span></div>
+                    </div>
+                </div>
+                <div class="card-2 glass-card">
+                    <div class="top-row">
+                        <div class="icon-box">🎯</div>
+                        <div class="title-wrap"><span class="notif-title">Target hit!</span><span class="notif-time">2
+                                min ago</span></div>
+                    </div>
+                    <div class="notif-body">Sony WH-1000XM5 dropped to <span class="highlight">₹21,700</span> — your
+                        target was ₹22,000</div>
+                </div>
+                <div class="card-3 glass-card">
+                    <div class="avatars">
+                        <div class="avatar av-1">AS</div>
+                        <div class="avatar av-2">MJ</div>
+                        <div class="avatar av-3">TK</div>
+                        <div class="avatar av-4">RP</div>
+                    </div>
+                    <span><span class="highlight">12,847</span> members tracking deals</span>
+                </div>
+            </div>
+            <div class="perks-list">
+                <div class="perk-item">
+                    <div class="perk-icon">🔔</div>
+                    <div class="perk-text"><span>Instant email alerts</span> when prices drop</div>
+                </div>
+                <div class="perk-item">
+                    <div class="perk-icon">🎯</div>
+                    <div class="perk-text"><span>Set a target price</span> — only alert when it matters</div>
+                </div>
+                <div class="perk-item">
+                    <div class="perk-icon">📈</div>
+                    <div class="perk-text"><span>Full price history</span> for every product</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function setupToggle(btnId, inputId) {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            btn.addEventListener('click', () => {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                if (isPassword) {
+                    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+                    btn.style.color = '#f9bf29';
+                } else {
+                    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+                    btn.style.color = 'rgba(255,255,255,0.25)';
+                }
+            });
+        }
+        setupToggle('togglePassword', 'password');
+        setupToggle('toggleConfirmPassword', 'confirmPassword');
+
+        const passwordInput = document.getElementById('password');
+        const fill = document.getElementById('pwdFill');
+        const label = document.getElementById('pwdLabel');
+        passwordInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            let strength = 0;
+            if (val.length >= 1) strength = 1;
+            if (val.length >= 8) strength = 2;
+            if (val.length >= 8 && (/[A-Z]/.test(val) || /\d/.test(val))) strength = 3;
+            if (val.length >= 8 && /[A-Z]/.test(val) && /\d/.test(val) && /[^A-Za-z0-9]/.test(val)) strength = 4;
+            switch (strength) {
+                case 0: fill.style.width = '0%'; label.textContent = ''; break;
+                case 1: fill.style.width = '25%'; fill.style.background = '#dc3545'; label.style.color = '#dc3545'; label.textContent = 'Weak'; break;
+                case 2: fill.style.width = '50%'; fill.style.background = '#f9bf29'; label.style.color = '#f9bf29'; label.textContent = 'Fair'; break;
+                case 3: fill.style.width = '75%'; fill.style.background = '#5a7d6d'; label.style.color = '#5a7d6d'; label.textContent = 'Good'; break;
+                case 4: fill.style.width = '100%'; fill.style.background = '#3b5d50'; label.style.color = '#3b5d50'; label.textContent = 'Strong'; break;
+            }
+        });
+
+        const registerForm = document.getElementById('registerForm');
+        const errorBanner = document.getElementById('errorBanner');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showError(msg) {
+            errorBanner.textContent = msg;
+            errorBanner.classList.add('show');
+        }
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+
+            errorBanner.classList.remove('show');
+            if (!firstName || !lastName) return showError("First and last name are required.");
+            if (!/\\S+@\\S+\\.\\S+/.test(email)) return showError("Please enter a valid email address.");
+            if (password.length < 8) return showError("Password must be at least 8 characters long.");
+            if (password !== confirmPassword) return showError("Passwords do not match.");
+            if (!terms) return showError("You must agree to the Terms of Service.");
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account...';
+
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Registration failed.');
+                localStorage.setItem('session_token', data.session_token);
+                localStorage.setItem('user_email', data.email);
+                window.location.href = '/';
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create my free account';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import Image from 'next/image'
 import { subscribeToProduct } from '@/lib/api'
+import { isLoggedIn, getUserEmail, getSessionToken } from '@/lib/auth'
 
 interface ModalProps {
   productId: number
@@ -16,6 +17,17 @@ const Modal = ({ productId, isOpen, onClose }: ModalProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
+  const [isPrefilled, setIsPrefilled] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && isLoggedIn()) {
+      const storedEmail = getUserEmail();
+      if (storedEmail) {
+        setEmail(storedEmail);
+        setIsPrefilled(true);
+      }
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null
 
@@ -46,7 +58,8 @@ const Modal = ({ productId, isOpen, onClose }: ModalProps) => {
         body.targetPrice = parsed
       }
 
-      const result = await subscribeToProduct(productId, email, body.targetPrice)
+      const token = getSessionToken() || undefined;
+      const result = await subscribeToProduct(productId, email, body.targetPrice, token)
       setMessage(result.message || 'Subscribed successfully!')
       setIsError(false)
       setEmail('')
@@ -96,6 +109,8 @@ const Modal = ({ productId, isOpen, onClose }: ModalProps) => {
               placeholder="you@example.com"
               className="dialog-input"
               required
+              readOnly={isPrefilled}
+              style={isPrefilled ? { cursor: 'not-allowed', backgroundColor: '#f9f9f9', color: '#6a6a6a' } : undefined}
             />
           </div>
 

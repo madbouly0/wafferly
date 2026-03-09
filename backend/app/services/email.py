@@ -78,6 +78,16 @@ NOTIFICATION_TYPES = {
             "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
+    'MAGIC_LINK': {
+        'subject': 'Your Wafferly login link',
+        'body': (
+            "Hello!\n\n"
+            "Click the link below to sign in to your Wafferly dashboard.\n\n"
+            "{magic_link_url}\n\n"
+            "This link will expire in 15 minutes.\n\n"
+            "— Wafferly 🧇"
+        ),
+    },
 }
 
 
@@ -115,6 +125,12 @@ def send_email(to_email, notification_type, product_data, unsubscribe_token=None
         msg['To'] = to_email
         msg['Subject'] = template['subject']
 
+        # Build the magic link URL if applicable
+        magic_link_url = ""
+        if notification_type == 'MAGIC_LINK':
+            token = product_data.get('magic_link_token')
+            magic_link_url = f"{FRONTEND_URL}/auth/verify?token={token}"
+
         # Fill in the template with actual product data + the unsubscribe link
         body = template['body'].format(
             title=product_data.get('title', 'Unknown Product'),
@@ -125,9 +141,30 @@ def send_email(to_email, notification_type, product_data, unsubscribe_token=None
             old_price=product_data.get('old_price', 0),
             target_price=product_data.get('target_price', 0),
             unsubscribe_url=unsubscribe_url,
+            magic_link_url=magic_link_url,
         )
 
-        msg.attach(MIMEText(body, 'plain'))
+        # For MAGIC_LINK, use a simpler HTML template with a big button
+        if notification_type == 'MAGIC_LINK':
+            html_msg = f"""
+            <html>
+              <body style="font-family: Arial, sans-serif; text-align: center; padding: 40px; background-color: #f9fafb;">
+                <div style="max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                  <h1 style="color: #065f46; font-size: 24px; margin-bottom: 20px;">Sign in to Wafferly 🧇</h1>
+                  <p style="color: #4b5563; font-size: 16px; margin-bottom: 30px;">Click the button below to sign in to your Wafferly dashboard. This link expires in 15 minutes.</p>
+                  <a href="{magic_link_url}" style="display: inline-block; background-color: #059669; color: white; text-decoration: none; padding: 14px 28px; font-size: 16px; font-weight: bold; border-radius: 6px;">Sign In to Dashboard</a>
+                  <p style="color: #9ca3af; font-size: 14px; margin-top: 30px;">If you didn't request this email, you can safely ignore it.</p>
+                </div>
+              </body>
+            </html>
+            """
+            
+            # Use MIMEMultipart with both plain and HTML
+            # msg is already MIMEMultipart. attach plain text first, then HTML.
+            msg.attach(MIMEText(body, 'plain'))
+            msg.attach(MIMEText(html_msg, 'html'))
+        else:
+            msg.attach(MIMEText(body, 'plain'))
 
         # Connect to Gmail and send the message
         with smtplib.SMTP(config.MAIL_SERVER, config.MAIL_PORT) as server:

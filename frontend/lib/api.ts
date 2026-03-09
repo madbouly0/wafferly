@@ -27,13 +27,16 @@ export const scrapeProduct = async (url: string) => {
 export const subscribeToProduct = async (
   productId: number,
   email: string,
-  targetPrice?: number   // optional — if provided, only notify when price drops below this
+  targetPrice?: number,  // optional — if provided, only notify when price drops below this
+  token?: string         // optional — if logged in, link subscription to user
 ) => {
   const body: { email: string; targetPrice?: number } = { email }
   if (targetPrice !== undefined) {
     body.targetPrice = targetPrice
   }
-  const response = await api.post(`/products/${productId}/subscribe`, body);
+
+  const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+  const response = await api.post(`/products/${productId}/subscribe`, body, config);
   return response.data;
 };
 

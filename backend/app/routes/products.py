@@ -1,9 +1,11 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import text
 from app import get_db
-from app.models.product import Product, PriceHistory, ProductSubscriber
+from app.models.product import Product, PriceHistory, ProductSubscriber, Session
 from app.scraper.amazon import scrape_amazon_product
 from app.services.email import send_email
+from app.routes.auth import get_current_user
+from datetime import datetime
 
 # A Blueprint is just a way to group related routes together
 products_bp = Blueprint('products', __name__)
@@ -184,6 +186,10 @@ def subscribe_to_product(product_id):
         if not product:
             return jsonify({"error": "Product not found"}), 404
 
+        # Check for authentication token and resolve user
+        user = get_current_user(db)
+        user_id = user.id if user else None
+
         # Check if this email is already subscribed to this product
         already_subscribed = db.query(ProductSubscriber).filter(
             ProductSubscriber.product_id == product_id,
@@ -193,6 +199,11 @@ def subscribe_to_product(product_id):
         if already_subscribed:
             # If they are already subscribed, just update their target price
             already_subscribed.target_price = target_price
+            
+            # If they just logged in, link the record to their user ID explicitly
+            if user_id and not already_subscribed.user_id:
+                already_subscribed.user_id = user_id
+                
             db.commit()
             db.refresh(already_subscribed)
             subscriber = already_subscribed
@@ -202,6 +213,7 @@ def subscribe_to_product(product_id):
             subscriber = ProductSubscriber(
                 product_id=product_id,
                 email=email,
+                user_id=user_id,
                 target_price=target_price,
             )
             db.add(subscriber)

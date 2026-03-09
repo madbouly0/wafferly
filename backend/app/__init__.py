@@ -28,8 +28,10 @@ def create_app():
     # Register blueprints (routes)
     from app.routes.products import products_bp
     from app.routes.cron import cron_bp
+    from app.routes.auth import auth_bp
 
     app.register_blueprint(products_bp, url_prefix='/api')
     app.register_blueprint(cron_bp, url_prefix='/api')
+    app.register_blueprint(auth_bp, url_prefix='/api')
 
     return app

@@ -7,6 +7,39 @@ import uuid
 Base = declarative_base()
 
 
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String(255), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login_at = Column(DateTime, nullable=True)
+
+    # Relationships
+    sessions = relationship('Session', back_populates='user', cascade='all, delete-orphan')
+    subscriptions = relationship('ProductSubscriber', back_populates='user')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'createdAt': self.created_at.isoformat() if self.created_at else None,
+            'lastLoginAt': self.last_login_at.isoformat() if self.last_login_at else None,
+        }
+
+
+class Session(Base):
+    __tablename__ = 'sessions'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    token = Column(String(100), unique=True, nullable=False, default=lambda: str(uuid.uuid4()))
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship('User', back_populates='sessions')
+
+
+
 class Product(Base):
     # This tells SQLAlchemy which table in the database this class maps to
     __tablename__ = 'products'
@@ -83,6 +116,7 @@ class ProductSubscriber(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     email = Column(String(320), nullable=False)
     subscribed_at = Column(DateTime, default=datetime.utcnow)
 
@@ -97,6 +131,9 @@ class ProductSubscriber(Base):
 
     # Link back to the product this subscriber is watching
     product = relationship('Product', back_populates='subscribers')
+
+    # Link back to the user object (if authenticated)
+    user = relationship('User', back_populates='subscriptions')
 
     def to_dict(self):
         return {

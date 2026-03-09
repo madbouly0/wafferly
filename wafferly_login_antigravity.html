@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wafferly - Sign In</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Exact Design Tokens */
+        :root {
+            --color-primary:        #3b5d50;
+            --color-primary-light:  #5a7d6d;
+            --color-primary-dark:   #2d4a40;
+            --color-secondary:      #f9bf29;
+            --color-secondary-dark: #f8b810;
+            --color-white:          #ffffff;
+            --color-error:          #dc3545;
+            --radius-10: 10px;
+            --radius-20: 20px;
+            --radius-30: 30px;
+            --font-body:    'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-primary);
+            font-family: var(--font-body);
+            color: var(--color-white);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 
+         * Background Layer 
+         */
+        .universe {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Teal depth gradients */
+        .universe::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 120% 80% at 20% 50%, #2d4a40 0%, transparent 55%),
+                radial-gradient(ellipse 80% 100% at 80% 30%, #4a7060 0%, transparent 50%),
+                radial-gradient(ellipse 60% 60% at 60% 90%, #2a4538 0%, transparent 45%);
+            background-color: var(--color-primary);
+        }
+
+        /* Drifting dot grid */
+        .universe::after {
+            content: "";
+            position: absolute;
+            inset: -100px; /* offset for drift bounds */
+            background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+            animation: driftGrid 40s linear infinite;
+        }
+
+        @keyframes driftGrid {
+            from { transform: translate(0, 0); }
+            to   { transform: translate(28px, 28px); }
+        }
+
+        /* 4 Floating Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .orb-1 {
+            width: 500px; height: 500px;
+            top: -10%; left: -10%;
+            background: rgba(59,93,80,0.5); /* teal */
+            animation: moveOrb1 22s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 400px; height: 400px;
+            bottom: -5%; right: -5%;
+            background: rgba(249,191,41,0.18); /* gold */
+            animation: moveOrb2 18s ease-in-out infinite alternate-reverse;
+        }
+        .orb-3 {
+            width: 280px; height: 280px;
+            top: 40%; right: 10%;
+            background: rgba(59,93,80,0.25); /* teal */
+            animation: moveOrb3 26s linear infinite;
+        }
+        .orb-4 {
+            width: 180px; height: 180px;
+            top: 50%; left: 40%;
+            background: rgba(249,191,41,0.1); /* gold */
+            animation: moveOrb4 14s ease-in-out infinite alternate;
+        }
+
+        @keyframes moveOrb1 {
+            from { transform: translate(0, 0) scale(0.97); }
+            to   { transform: translate(-40px, 40px) scale(1.05); }
+        }
+        @keyframes moveOrb2 {
+            from { transform: translate(0, 0); }
+            to   { transform: translate(-50px, -50px); }
+        }
+        @keyframes moveOrb3 {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to   { transform: translate(-30px, 30px) rotate(180deg); }
+        }
+        @keyframes moveOrb4 {
+            from { transform: translate(0, 0) scale(0.97); }
+            to   { transform: translate(40px, -40px) scale(1.05); }
+        }
+
+        /* 
+         * Layout 
+         */
+        #layout-container {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 55% 45%;
+            max-width: 1280px;
+            width: 100%;
+            height: 100vh;
+            padding: 40px;
+            gap: 32px;
+            align-items: center;
+        }
+
+        /* Left Panel */
+        .left-col {
+            position: relative;
+            opacity: 0;
+            animation: slideLeft 0.9s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes slideLeft {
+            from { transform: translateX(-40px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-white);
+            letter-spacing: -0.5px;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.1s;
+        }
+        .logo span {
+            opacity: 0.4;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 3vw, 3rem);
+            font-weight: 700;
+            color: var(--color-white);
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.2s;
+        }
+        h1 .highlight {
+            color: var(--color-secondary);
+        }
+
+        .subtext {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.45);
+            max-width: 340px;
+            line-height: 1.5;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.3s;
+        }
+
+        /* Floating Cards Cluster */
+        .cards-cluster {
+            position: relative;
+            height: 280px;
+            width: 100%;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.4s;
+        }
+
+        .glass-card {
+            backdrop-filter: blur(20px);
+            /* Fallback for Safari */
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Card 1: Price History Chart */
+        .card-1 {
+            position: absolute;
+            top: 0;
+            left: 20px;
+            width: 280px;
+            padding: 20px 22px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-20);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+            animation: driftCard1 8s ease-in-out infinite;
+        }
+        @keyframes driftCard1 {
+            0%   { transform: translateY(0) rotate(0); }
+            50%  { transform: translateY(-14px) rotate(-0.5deg); }
+            75%  { transform: translateY(8px) rotate(0.3deg); }
+            100% { transform: translateY(0) rotate(0); }
+        }
+
+        .card-1 .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
+        }
+        .card-1 .title {
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-white);
+            margin-bottom: 12px;
+        }
+
+        /* Card 2: Price Drop Alert */
+        .card-2 {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            width: 190px;
+            padding: 16px 18px;
+            background: rgba(249,191,41,0.1);
+            border: 1px solid rgba(249,191,41,0.3);
+            border-radius: var(--radius-20);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 12px 40px rgba(249,191,41,0.12);
+            animation: driftCard2 11s ease-in-out infinite;
+        }
+        @keyframes driftCard2 {
+            0%   { transform: translateY(0) rotate(1.5deg); }
+            50%  { transform: translateY(-18px) rotate(2.5deg); }
+            75%  { transform: translateY(18px) rotate(0deg); }
+            100% { transform: translateY(0) rotate(1.5deg); }
+        }
+
+        .card-2 .top-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 8px;
+            text-transform: uppercase;
+            color: var(--color-secondary);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .card-2 .product {
+            font-size: 13px;
+            color: var(--color-white);
+            font-weight: 500;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-2 .pricing {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-2 .current {
+            color: var(--color-white);
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .card-2 .strikethrough {
+            color: rgba(255,255,255,0.4);
+            text-decoration: line-through;
+            font-size: 11px;
+        }
+        .card-2 .badge {
+            background: var(--color-secondary);
+            color: #111;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* Card 3: Live Tracker Pill */
+        .card-3 {
+            position: absolute;
+            bottom: 10px;
+            left: 60px;
+            padding: 9px 16px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: driftCard3 13s ease-in-out infinite alternate;
+        }
+        @keyframes driftCard3 {
+            0%   { transform: translate(0, 0); }
+            50%  { transform: translate(10px, -12px); }
+            100% { transform: translate(-8px, 8px); }
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-secondary);
+            animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot {
+            0%   { box-shadow: 0 0 8px rgba(249,191,41,0.8); }
+            50%  { box-shadow: 0 0 16px rgba(249,191,41,0.8); }
+            100% { box-shadow: 0 0 8px rgba(249,191,41,0.8); }
+        }
+        
+        .card-3 span {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+        .card-3 .highlight {
+            color: var(--color-secondary);
+            font-weight: 600;
+        }
+
+        /* Trust Row */
+        .trust-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.5s;
+        }
+        .trust-item {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.35);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .trust-item span {
+            color: var(--color-secondary);
+        }
+
+        /* Right Panel - Glass Form Card */
+        .right-col {
+            opacity: 0;
+            animation: slideRight 0.9s cubic-bezier(0.16,1,0.3,1) forwards 0.15s;
+            display: flex;
+            justify-content: flex-end;
+        }
+        @keyframes slideRight {
+            from { transform: translateX(40px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        .form-card {
+            position: relative;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 28px;
+            padding: 44px 40px;
+            max-width: 420px;
+            width: 100%;
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            box-shadow:
+                0 32px 80px rgba(0,0,0,0.4),
+                0 0 0 1px rgba(59,93,80,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            animation: levitate 9s ease-in-out infinite;
+        }
+        @keyframes levitate {
+            0%   { transform: translateY(0); }
+            45%  { transform: translateY(-8px); }
+            75%  { transform: translateY(5px); }
+            100% { transform: translateY(0); }
+        }
+
+        .form-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 15%; right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-secondary), transparent);
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-secondary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.3s;
+        }
+        .eyebrow-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--color-secondary);
+            box-shadow: 0 0 8px rgba(249,191,41,0.8);
+        }
+
+        .form-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-white);
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.35s;
+        }
+        .form-sub {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.35s;
+        }
+
+        .error-banner {
+            display: none;
+            background: rgba(220,53,69,0.12);
+            border: 1px solid rgba(220,53,69,0.3);
+            border-radius: var(--radius-10);
+            color: #ff8080;
+            font-size: 0.82rem;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        .error-banner.show {
+            display: block;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 16px;
+            opacity: 0;
+        }
+        #fg-email { animation: fadeUp 0.6s ease forwards 0.44s; }
+        #fg-password { animation: fadeUp 0.6s ease forwards 0.49s; }
+
+        .form-input {
+            width: 100%;
+            height: 48px;
+            border-radius: var(--radius-10);
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            color: var(--color-white);
+            padding: 0 16px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+        }
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        .form-input:focus {
+            border-color: rgba(249,191,41,0.5);
+            box-shadow: 0 0 0 3px rgba(249,191,41,0.12), 0 0 20px rgba(249,191,41,0.08);
+        }
+
+        .forgot-link {
+            position: absolute;
+            top: -22px; right: 0;
+            color: rgba(249,191,41,0.6);
+            font-size: 0.78rem;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .forgot-link:hover {
+            color: var(--color-secondary);
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%; right: 16px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.25);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+        .password-toggle:hover {
+            color: var(--color-secondary);
+        }
+
+        .btn {
+            height: 50px;
+            width: 100%;
+            border-radius: var(--radius-30);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: 1.5px solid rgba(91,125,109,0.6);
+            box-shadow: 0 4px 20px rgba(59,93,80,0.4);
+            margin-top: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.58s;
+        }
+        .btn-primary:hover {
+            background: var(--color-primary-light);
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: rgba(255,255,255,0.25);
+            font-size: 0.85rem;
+            margin: 24px 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.62s;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .divider::before { margin-right: 12px; }
+        .divider::after { margin-left: 12px; }
+
+        .btn-secondary {
+            background: rgba(249,191,41,0.1);
+            color: var(--color-secondary);
+            border: 1.5px solid rgba(249,191,41,0.3);
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.66s;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(249,191,41,0.2);
+        }
+
+        .register {
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.3);
+            margin-top: 24px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.7s;
+        }
+        .register a {
+            color: rgba(249,191,41,0.8);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .register a:hover {
+            color: var(--color-secondary);
+        }
+
+        /* Generic fadeUp */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            #layout-container {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+                height: 100%;
+                padding: 40px 20px;
+                gap: 60px;
+            }
+            body {
+                overflow: auto;
+            }
+            .right-col {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Layer -->
+    <div class="universe">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div id="layout-container">
+        
+        <!-- Left Side: Brand + Floating Cards -->
+        <div class="left-col">
+            <div class="logo">Wafferly<span>.</span></div>
+            <h1>Never pay full price <span class="highlight">again.</span></h1>
+            <p class="subtext">Join over 50,000 smart shoppers tracking deals, setting alerts, and saving money on Amazon.</p>
+
+            <div class="cards-cluster">
+                
+                <!-- Card 1: Price History Chart -->
+                <div class="card-1 glass-card">
+                    <div class="label">PRICE HISTORY</div>
+                    <div class="title">Sony WH-1000XM5</div>
+                    
+                    <svg viewBox="0 0 260 100" width="100%" height="90px">
+                        <defs>
+                            <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="white" stop-opacity="0.18" />
+                                <stop offset="100%" stop-color="white" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- y-axis -->
+                        <g fill="rgba(255,255,255,0.35)" font-size="6">
+                            <text x="0" y="12">28k</text>
+                            <text x="0" y="28">26k</text>
+                            <text x="0" y="44">24k</text>
+                            <text x="0" y="60">22k</text>
+                            <text x="0" y="76">20k</text>
+                        </g>
+
+                        <!-- grid lines -->
+                        <g stroke="rgba(255,255,255,0.05)">
+                            <line x1="18" y1="8" x2="248" y2="8" />
+                            <line x1="18" y1="24" x2="248" y2="24" />
+                            <line x1="18" y1="40" x2="248" y2="40" />
+                            <line x1="18" y1="56" x2="248" y2="56" />
+                            <line x1="18" y1="72" x2="248" y2="72" />
+                        </g>
+
+                        <!-- Area Fill -->
+                        <path d="M36 19 L62 14 L88 22 L114 33 L140 38 L166 49 L192 41 L218 30 L232 25 L232 72 L36 72 Z" fill="url(#areaGrad2)" />
+
+                        <!-- Price Line -->
+                        <polyline points="36,19 62,14 88,22 114,33 140,38 166,49 192,41 218,30 232,25" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round" fill="none" />
+
+                        <!-- Data Dots -->
+                        <g fill="rgba(255,255,255,0.5)">
+                            <circle cx="36" cy="19" r="2" />
+                            <circle cx="62" cy="14" r="2" />
+                            <circle cx="88" cy="22" r="2" />
+                            <circle cx="114" cy="33" r="2" />
+                            <circle cx="140" cy="38" r="2" />
+                            <circle cx="192" cy="41" r="2" />
+                            <circle cx="218" cy="30" r="2" />
+                            <circle cx="232" cy="25" r="2" />
+                        </g>
+
+                        <!-- Lowest Highlight -->
+                        <circle cx="166" cy="49" r="10" fill="rgba(249,191,41,0.12)" />
+                        <circle cx="166" cy="49" r="4" fill="#f9bf29" />
+                        <circle cx="166" cy="49" r="2" fill="#fff" />
+
+                        <!-- Tooltip Pointer -->
+                        <polygon points="163,54 169,54 166,50" fill="#2d4a40" />
+                        <!-- Tooltip pointer stroke hack to match rect stroke -->
+                        <polyline points="163,54 166,50 169,54" stroke="rgba(249,191,41,0.4)" stroke-width="1" fill="none" />
+
+                        <!-- Tooltip Box -->
+                        <rect x="130" y="54" width="72" height="20" rx="5" fill="#2d4a40" stroke="rgba(249,191,41,0.4)" stroke-width="1" />
+                        <text x="166" y="67" text-anchor="middle" font-size="6" fill="#f9bf29">₹21,700 <tspan fill="rgba(255,255,255,0.4)">·</tspan> Lowest</text>
+
+                        <!-- x-axis labels -->
+                        <g font-size="6" fill="rgba(255,255,255,0.3)" text-anchor="middle">
+                            <text x="36" y="82">Jun</text>
+                            <text x="62" y="82">Jul</text>
+                            <text x="88" y="82">Aug</text>
+                            <text x="114" y="82">Sep</text>
+                            <text x="140" y="82">Oct</text>
+                            <text x="166" y="82" fill="#f9bf29" font-weight="bold">Nov</text>
+                            <text x="192" y="82">Dec</text>
+                            <text x="218" y="82">Jan</text>
+                            <text x="232" y="82">Feb</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Card 2: Price Drop Alert -->
+                <div class="card-2 glass-card">
+                    <div class="top-label">
+                        <span>🔔</span> PRICE DROP
+                    </div>
+                    <div class="product">Apple AirPods Pro</div>
+                    <div class="pricing">
+                        <span class="current">₹18,900</span>
+                        <span class="strikethrough">₹24,900</span>
+                        <span class="badge">−24%</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Live Tracker -->
+                <div class="card-3 glass-card">
+                    <div class="pulse-dot"></div>
+                    <span>Tracking <span class="highlight">1,247</span> products live</span>
+                </div>
+            </div>
+
+            <div class="trust-row">
+                <div class="trust-item"><span>✓</span> Free to use</div>
+                <div class="trust-item"><span>✓</span> Instant email alerts</div>
+                <div class="trust-item"><span>✓</span> Auto re-checks</div>
+            </div>
+        </div>
+
+        <!-- Right Side: Glass Form Card -->
+        <div class="right-col">
+            <div class="form-card">
+                <div class="eyebrow">
+                    <div class="eyebrow-dot"></div>
+                    WELCOME BACK
+                </div>
+                <h2 class="form-title">Sign in</h2>
+                <div class="form-sub">Your dashboard and saved deals are waiting.</div>
+
+                <div class="error-banner" id="errorBanner"></div>
+
+                <form id="loginForm">
+                    <div class="form-group" id="fg-email">
+                        <input type="email" id="email" class="form-input" placeholder="Email address" required>
+                    </div>
+
+                    <div class="form-group" id="fg-password">
+                        <a href="#" class="forgot-link">Forgot?</a>
+                        <input type="password" id="password" class="form-input" placeholder="Password" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Sign in to Wafferly</button>
+                </form>
+
+                <div class="divider">or</div>
+
+                <button type="button" class="btn btn-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <div class="register">
+                    Don't have an account? <a href="#">Create one &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Logic -->
+    <script>
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        toggleBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            
+            // Toggle SVG icon
+            if (isPassword) {
+                toggleBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                `;
+                toggleBtn.style.color = 'var(--color-secondary)';
+            } else {
+                toggleBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                `;
+                toggleBtn.style.color = 'rgba(255,255,255,0.25)';
+            }
+        });
+
+        // Form Submission logic
+        const loginForm = document.getElementById('loginForm');
+        const errorBanner = document.getElementById('errorBanner');
+        const submitBtn = document.getElementById('submitBtn');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = passwordInput.value;
+            
+            // UI state updates
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+            errorBanner.classList.remove('show');
+            
+            try {
+                // Backend connection
+                const res = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Invalid email or password.');
+                }
+                
+                // On success
+                localStorage.setItem('session_token', data.session_token);
+                localStorage.setItem('user_email', data.email);
+                window.location.href = '/';
+                
+            } catch (err) {
+                // On error
+                errorBanner.textContent = err.message;
+                errorBanner.classList.add('show');
+            } finally {
+                // Restore UI state
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign in to Wafferly';
+            }
+        });
+    </script>
+</body>
+</html>

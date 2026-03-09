@@ -10,6 +10,7 @@ import Particles from '@/components/reactbits/Particles'
 import TextReveal from '@/components/animations/TextReveal'
 import SkewReveal from '@/components/animations/SkewReveal'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { getProducts } from '@/lib/api'
 import { Product } from '@/types'
 
@@ -69,8 +70,15 @@ const fadeUp = (delay: number) => ({
 const Home = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
+    const token = localStorage.getItem('session_token')
+    if (!token) {
+      router.push('/auth/login')
+      return
+    }
+
     ; (async () => {
       try {
         const response = await getProducts()
@@ -81,7 +89,7 @@ const Home = () => {
         setLoading(false)
       }
     })()
-  }, [])
+  }, [router])
 
   return (
     <>
