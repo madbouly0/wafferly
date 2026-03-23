@@ -217,11 +217,11 @@ const Home = () => {
                 icon: (
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                   </svg>
                 ),
                 title: 'Auto Re-check Every 6 hrs',
-                description: 'Wafferly re-scrapes Amazon automatically, keeping your price data fresh and accurate around the clock.',
+                description: 'Wafferly re-scrapes Amazon automatically, keeping your price data fresh and accurate.',
               },
               {
                 icon: (

@@ -85,12 +85,27 @@ const Navbar = () => {
           {hasSession ? (
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#E4BF57] hover:bg-[#d4b04d] text-[#1e1e1e] font-medium rounded-full transition-colors text-sm"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "0.5rem",
+                padding: "6px 14px 6px 6px",
+                borderRadius: "var(--radius-30)",
+                background: "rgba(255,255,255,0.12)",
+                border: "1.5px solid rgba(255,255,255,0.2)",
+                color: "white", fontSize: "0.85rem", fontWeight: 600,
+                textDecoration: "none",
+              }}
             >
-              <div className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-xs font-bold shadow-sm">
-                {emailInitials}
-              </div>
-              Dashboard
+              <span style={{
+                width: 26, height: 26, borderRadius: "50%",
+                background: "var(--color-secondary)",
+                color: "var(--color-dark)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.72rem", fontWeight: 800,
+                fontFamily: "var(--font-spaceGrotesk)",
+              }}>
+                {emailInitials ? emailInitials.charAt(0) : "U"}
+              </span>
+              Profile
             </Link>
           ) : (
             <Link

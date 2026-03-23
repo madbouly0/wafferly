@@ -22,16 +22,22 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
 
-    # Enable CORS for Next.js frontend
-    CORS(app, origins=["http://localhost:3000"])
+    # Enable CORS for Next.js frontend and the browser extension
+    CORS(app, origins=[
+        "http://localhost:3000",  # Next.js dev server
+        "chrome-extension://*",  # Chrome/Edge extension
+        "moz-extension://*",     # Firefox extension (future)
+    ], supports_credentials=True)
 
     # Register blueprints (routes)
     from app.routes.products import products_bp
     from app.routes.cron import cron_bp
     from app.routes.auth import auth_bp
+    from app.routes.collections import collections_bp
 
     app.register_blueprint(products_bp, url_prefix='/api')
     app.register_blueprint(cron_bp, url_prefix='/api')
     app.register_blueprint(auth_bp, url_prefix='/api')
+    app.register_blueprint(collections_bp, url_prefix='/api')
 
     return app

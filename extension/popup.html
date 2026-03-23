@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wafferly</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">Waff<span>erly</span></div>
+    <div class="tagline">Amazon Price Tracker</div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Login View -->
+    <div id="view-login">
+      <div id="login-message" class="message" style="display:none"></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-btn">
+          <span id="login-btn-label">Sign In</span>
+        </button>
+      </form>
+      <div class="divider"></div>
+      <p class="hint">Don't have an account? Visit <strong>wafferly.app</strong> to sign up.</p>
+    </div>
+
+    <!-- Logged-in View -->
+    <div id="view-loggedin" style="display:none">
+      <div class="user-info">
+        <div class="avatar" id="user-avatar">U</div>
+        <div class="user-details">
+          <div class="user-email" id="user-email-display">—</div>
+          <div class="user-label">Wafferly account</div>
+        </div>
+      </div>
+
+      <div id="track-message" class="message" style="display:none"></div>
+
+      <button class="btn btn-primary" id="track-btn" style="display:none">
+        <span id="track-btn-label">Track This Product</span>
+      </button>
+
+      <p id="not-amazon-hint" class="hint" style="display:none; margin-top:0.5rem">
+        Navigate to an Amazon product page to track it.
+      </p>
+
+      <div class="divider"></div>
+      <button class="btn btn-secondary" id="logout-btn">Sign Out</button>
+    </div>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

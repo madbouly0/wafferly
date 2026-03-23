@@ -63,6 +63,10 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # NEW: Link to collection (optional, null if not in a collection)
+    collection_id = Column(Integer, ForeignKey('collections.id', ondelete='SET NULL'), nullable=True)
+    collection = relationship('Collection', back_populates='products')
+
     # These link the product to its price history and subscriber records
     price_history = relationship('PriceHistory', back_populates='product', cascade='all, delete-orphan')
     subscribers = relationship('ProductSubscriber', back_populates='product', cascade='all, delete-orphan')
@@ -88,6 +92,7 @@ class Product(Base):
             'isOutOfStock': self.is_out_of_stock,
             'priceHistory': [ph.to_dict() for ph in self.price_history],
             'subscribers': [sub.to_dict() for sub in self.subscribers],
+            'collectionId': self.collection_id,
             'createdAt': self.created_at.isoformat() if self.created_at else None,
             'updatedAt': self.updated_at.isoformat() if self.updated_at else None,
         }
