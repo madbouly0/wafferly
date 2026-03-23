@@ -20,4 +20,9 @@ frontend/.next/
 Thumbs.db
 
 # Chrome driver
-chromedriver.exe
+chromedriver.exe.planning/
+get-shit-done
+
+```ignore
+.planning/
+```
