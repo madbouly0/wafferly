@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import HeroCarousel from '@/components/HeroCarousel'
 import Searchbar from '@/components/Searchbar'
 import ProductCard from '@/components/ProductCard'
-import HorizontalScroll, { ParallaxCard } from '@/components/HorizontalScroll'
+import ProductCarousel from '@/components/ProductCarousel'
 import Particles from '@/components/reactbits/Particles'
 import TextReveal from '@/components/animations/TextReveal'
 import SkewReveal from '@/components/animations/SkewReveal'
@@ -276,13 +276,11 @@ const Home = () => {
             <a href="#hero-heading" className="btn btn-primary">Track your first product</a>
           </div>
         ) : (
-          <HorizontalScroll>
-            {allProducts.map((product, i) => (
-              <ParallaxCard key={product.id} index={i}>
-                <ProductCard product={product} />
-              </ParallaxCard>
+          <ProductCarousel>
+            {allProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
-          </HorizontalScroll>
+          </ProductCarousel>
         )}
       </section>
 
