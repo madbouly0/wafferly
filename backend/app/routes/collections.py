@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from sqlalchemy import func
 from app import get_db
 from app.models.collection import Collection
 from app.models.product import Product
@@ -15,13 +16,25 @@ def get_collections():
 
     try:
         collections = db.query(Collection).filter(Collection.user_id == user.id).all()
+        if not collections:
+            return jsonify({"data": []}), 200
+
+        collection_ids = [c.id for c in collections]
+
+        # 1. Fetch counts in ONE query instead of N queries
+        counts_query = db.query(Product.collection_id, func.count(Product.id)).filter(
+            Product.collection_id.in_(collection_ids)
+        ).group_by(Product.collection_id).all()
+        counts_map = {row[0]: row[1] for row in counts_query}
+
         result = []
         for col in collections:
             col_dict = col.to_dict()
             # Get up to 4 product preview images for the collage cover
-            products = db.query(Product).filter(Product.collection_id == col.id).limit(4).all()
-            col_dict['productCount'] = db.query(Product).filter(Product.collection_id == col.id).count()
-            col_dict['previewImages'] = [p.image for p in products if p.image]
+            products = db.query(Product.image).filter(Product.collection_id == col.id, Product.image != None).limit(4).all()
+            
+            col_dict['productCount'] = counts_map.get(col.id, 0)
+            col_dict['previewImages'] = [p[0] for p in products]
             result.append(col_dict)
         return jsonify({"data": result}), 200
     except Exception as e:

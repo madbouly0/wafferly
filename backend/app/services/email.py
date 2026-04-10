@@ -1,4 +1,5 @@
 import smtplib
+import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from config import Config
@@ -12,33 +13,33 @@ FRONTEND_URL = "http://localhost:3000"
 # {unsubscribe_url} is added to every template so users can always opt out
 NOTIFICATION_TYPES = {
     'LOWEST_PRICE': {
-        'subject': '🧇 Wafferly Alert: Lowest Price Ever!',
+        'subject': 'Wafferly Alert: Lowest Price Ever!',
         'body': (
             "Great news! The product you're tracking has hit its LOWEST price ever!\n\n"
             "Product: {title}\n"
             "Current Price: {currency} {price}\n\n"
             "Don't miss out — grab it now before the price goes back up!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇\n\n"
+            "— Wafferly \n\n"
             "---\n"
             "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'CHANGE_OF_STOCK': {
-        'subject': '🧇 Wafferly Alert: Back in Stock!',
+        'subject': ' Wafferly Alert: Back in Stock!',
         'body': (
             "The product you've been waiting for is back in stock!\n\n"
             "Product: {title}\n"
             "Current Price: {currency} {price}\n\n"
             "Hurry up — it might sell out again!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇\n\n"
+            "— Wafferly \n\n"
             "---\n"
             "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'THRESHOLD_MET': {
-        'subject': '🧇 Wafferly Alert: Huge Discount!',
+        'subject': ' Wafferly Alert: Huge Discount!',
         'body': (
             "The product you're tracking just hit a massive discount!\n\n"
             "Product: {title}\n"
@@ -46,26 +47,26 @@ NOTIFICATION_TYPES = {
             "Discount: {discount}% off!\n\n"
             "This deal won't last long!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇\n\n"
+            "— Wafferly \n\n"
             "---\n"
             "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'PRICE_DROP': {
-        'subject': '🧇 Wafferly Alert: Price Dropped!',
+        'subject': ' Wafferly Alert: Price Dropped!',
         'body': (
             "The price dropped on a product you're tracking!\n\n"
             "Product: {title}\n"
             "New Price: {currency} {price}\n"
             "Previous Price: {currency} {old_price}\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇\n\n"
+            "— Wafferly \n\n"
             "---\n"
             "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
     },
     'TARGET_REACHED': {
-        'subject': '🧇 Wafferly Alert: Your Target Price Was Hit!',
+        'subject': ' Wafferly Alert: Your Target Price Was Hit!',
         'body': (
             "Great news! A product you're tracking just dropped to your target price!\n\n"
             "Product: {title}\n"
@@ -73,7 +74,7 @@ NOTIFICATION_TYPES = {
             "Current Price:     {currency} {price}\n\n"
             "This is the price you were waiting for — act now!\n\n"
             "View on Amazon: {url}\n\n"
-            "— Wafferly 🧇\n\n"
+            "— Wafferly \n\n"
             "---\n"
             "Don't want these emails? Unsubscribe here: {unsubscribe_url}"
         ),
@@ -85,7 +86,7 @@ NOTIFICATION_TYPES = {
             "Click the link below to sign in to your Wafferly dashboard.\n\n"
             "{magic_link_url}\n\n"
             "This link will expire in 15 minutes.\n\n"
-            "— Wafferly 🧇"
+            "— Wafferly "
         ),
     },
 }
@@ -180,6 +181,19 @@ def send_email(to_email, notification_type, product_data, unsubscribe_token=None
         return False
 
 
+def send_email_async(to_email, notification_type, product_data, unsubscribe_token=None):
+    """
+    Non-blocking version of send_email. Spawns a background thread to handle the
+    SMTP connection, ensuring the main API thread isn't blocked by network latency.
+    """
+    thread = threading.Thread(
+        target=send_email,
+        args=(to_email, notification_type, product_data, unsubscribe_token)
+    )
+    thread.daemon = True
+    thread.start()
+
+
 def notify_subscribers(product, notification_type):
     """
     Send an email to every subscriber of a product.
@@ -205,14 +219,13 @@ def notify_subscribers(product, notification_type):
     success_count = 0
 
     for subscriber in product.subscribers:
-        # Pass each subscriber's unique token so their email has their own unsubscribe link
-        email_sent = send_email(
+        # Fire and forget: send emails in background threads to avoid blocking cron
+        send_email_async(
             subscriber.email,
             notification_type,
             product_data,
             unsubscribe_token=subscriber.unsubscribe_token,
         )
-        if email_sent:
-            success_count += 1
+        success_count += 1
 
-    print(f"Notified {success_count}/{len(product.subscribers)} subscribers for: {product.title}")
+    print(f"Queued notifications for {success_count}/{len(product.subscribers)} subscribers for: {product.title}")

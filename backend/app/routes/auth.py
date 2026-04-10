@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy import text
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta
 import bcrypt
 import uuid
@@ -163,7 +164,11 @@ def get_dashboard():
         if not user:
             return jsonify({"error": "Unauthorized"}), 401
             
-        subscriptions = db.query(ProductSubscriber).filter(ProductSubscriber.user_id == user.id).all()
+        # Optimize nested N+1 relationships
+        subscriptions = db.query(ProductSubscriber).filter(ProductSubscriber.user_id == user.id).options(
+            selectinload(ProductSubscriber.product).selectinload(Product.price_history),
+            selectinload(ProductSubscriber.product).selectinload(Product.subscribers)
+        ).all()
         
         tracked = []
         for sub in subscriptions:

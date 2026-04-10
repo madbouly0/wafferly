@@ -1,27 +1,40 @@
-#  Wafferly — Amazon Price Tracker
+# 📦 Wafferly
 
-Track Amazon product prices and get email alerts when prices drop!
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Features
+> *Track Amazon product prices and get email alerts when prices drop!*
 
-- 🔍 **Search & Track** — Paste any Amazon product link to start tracking
-- 📊 **Price History** — See price changes over time with interactive charts
-- 📧 **Email Alerts** — Get notified when prices drop
-- ⏰ **Auto Updates** — Products are re-scraped every 6 hours
-- 💰 **Price Stats** — View current, average, highest, and lowest prices
+## 🌟 Highlights
 
-## Tech Stack
+- **Search & Track** — Paste any Amazon product link to start tracking instantly
+- **Price History** — See price changes over time with interactive charts
+- **Email Alerts** — Get notified directly when prices drop to your target
+- **Auto Updates** — Products are re-scraped periodically so data is always fresh
+- **Price Stats** — View current, average, highest, and lowest prices at a glance
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16, React, TypeScript, Tailwind CSS v4 |
-| Backend | Flask, SQLAlchemy, Python |
-| Database | SQL Server Express |
-| Scraping | Selenium, BeautifulSoup |
-| Charts | Recharts |
-| Email | Gmail SMTP |
+## ℹ️ Overview
 
-## Getting Started
+Wafferly is an Amazon price tracker designed to help you save money on the products you love. It provides a sleek web interface for tracking price changes, visualizes historical price data through intuitive charts, and automatically sends you email alerts when target prices are met. 
+
+The application is built with a robust backend using Flask and Python to handle scraping (via Selenium) and data management, coupled with a modern React/Next.js frontend using Tailwind CSS for a seamless user experience.
+
+### ✍️ Authors
+
+- [madbouly0](https://github.com/madbouly0) - Creator and Maintainer
+
+## 🚀 Usage
+
+Using Wafferly is simple. Once the application is running, open the dashboard:
+
+1. Paste an Amazon product URL into the search bar.
+2. The product will be tracked, and its historical prices will be visualized using Recharts.
+3. Configure your account to receive email alerts when the price drops!
+
+*(Screenshots coming soon!)*
+
+## ⬇️ Installation
+
+Here is how you can set up Wafferly on your local machine.
 
 ### Prerequisites
 
@@ -30,28 +43,29 @@ Track Amazon product prices and get email alerts when prices drop!
 - SQL Server Express
 - Chrome browser (for Selenium)
 
-### Installation
+### Steps
 
-1. Clone the repo
+1. **Clone the repo**
 ```bash
 git clone https://github.com/madbouly0/wafferly.git
 cd wafferly
 ```
 
-2. Set up Python virtual environment
+2. **Set up Python backend**
 ```bash
 python -m venv .venv
 .venv\Scripts\Activate
 pip install -r requirements.txt
 ```
 
-3. Set up frontend
+3. **Set up frontend**
 ```bash
 cd frontend
 npm install
 ```
 
-4. Create `.env` file in root directory
+4. **Environment Configuration**
+Create a `.env` file in the root directory:
 ```env
 FLASK_ENV=development
 FLASK_PORT=5000
@@ -63,37 +77,49 @@ EMAIL_PASS=your_app_password
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
-5. Create the database in SSMS
+5. **Database Setup**
+Create the database in SSMS:
 ```sql
 CREATE DATABASE wafferly;
 ```
 
 ### Running the App
 
-Terminal 1 — Backend:
+You'll need a few terminals to run the full stack:
+
+**Terminal 1 — Backend:**
 ```bash
 cd backend
 python run.py
 ```
 
-Terminal 2 — Frontend:
+**Terminal 2 — Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
 
-Terminal 3 — Scheduler (optional):
+**Terminal 3 — Scheduler (optional):**
 ```bash
 cd backend
 python scheduler.py
 ```
 
-Visit **http://localhost:3000** 
+Now visit [http://localhost:3000](http://localhost:3000) to see Wafferly in action!
 
-## Screenshots
+## 💻 Tech Stack
 
-Coming soon!
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React, TypeScript, Tailwind CSS v4 |
+| Backend | Flask, SQLAlchemy, Python |
+| Database | SQL Server Express |
+| Scraping | Selenium, BeautifulSoup |
+| Charts | Recharts |
+| Email | Gmail SMTP |
 
-## License
+## 💭 Feedback and Contributing
 
-MIT
+If you encounter any issues or have feature requests, please open an issue in this repository. 
+
+Contributions, pull requests, and feedback are always welcome!

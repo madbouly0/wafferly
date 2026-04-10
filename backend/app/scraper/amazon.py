@@ -10,6 +10,10 @@ import re
 import json
 import random
 import time
+import threading
+
+DRIVER_PATH = None
+DRIVER_LOCK = threading.Lock()
 
 
 # Rotate between realistic user agents to avoid fingerprinting
@@ -63,7 +67,12 @@ def get_chrome_driver():
     options.add_argument("--disable-infobars")
     options.add_argument("--disable-notifications")
 
-    service = Service(ChromeDriverManager().install())
+    global DRIVER_PATH
+    with DRIVER_LOCK:
+        if DRIVER_PATH is None:
+            DRIVER_PATH = ChromeDriverManager().install()
+
+    service = Service(DRIVER_PATH)
     driver = webdriver.Chrome(service=service, options=options)
 
     # Patch navigator.webdriver to undefined via CDP

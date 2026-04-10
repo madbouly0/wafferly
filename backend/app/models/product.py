@@ -45,7 +45,7 @@ class Product(Base):
     __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    url = Column(String(2048), nullable=False, unique=True)
+    url = Column(String(2048), nullable=False, unique=True, index=True)
     title = Column(String(500))
     image = Column(String(2048))
     currency = Column(String(10), default='$')
@@ -56,7 +56,7 @@ class Product(Base):
     average_price = Column(DECIMAL(10, 2))
     discount_rate = Column(Integer, default=0)
     description = Column(Text)
-    category = Column(String(200))
+    category = Column(String(200), index=True)
     reviews_count = Column(Integer, default=0)
     stars = Column(DECIMAL(3, 2), default=0)
     is_out_of_stock = Column(Boolean, default=False)
@@ -64,7 +64,7 @@ class Product(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # NEW: Link to collection (optional, null if not in a collection)
-    collection_id = Column(Integer, ForeignKey('collections.id', ondelete='SET NULL'), nullable=True)
+    collection_id = Column(Integer, ForeignKey('collections.id', ondelete='SET NULL'), nullable=True, index=True)
     collection = relationship('Collection', back_populates='products')
 
     # These link the product to its price history and subscriber records
@@ -102,9 +102,9 @@ class PriceHistory(Base):
     __tablename__ = 'price_history'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'), nullable=False)
+    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'), nullable=False, index=True)
     price = Column(DECIMAL(10, 2), nullable=False)
-    recorded_at = Column(DateTime, default=datetime.utcnow)
+    recorded_at = Column(DateTime, default=datetime.utcnow, index=True)
 
     # Link back to the product this price belongs to
     product = relationship('Product', back_populates='price_history')
@@ -120,9 +120,9 @@ class ProductSubscriber(Base):
     __tablename__ = 'product_subscribers'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
-    email = Column(String(320), nullable=False)
+    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=True, index=True)
+    email = Column(String(320), nullable=False, index=True)
     subscribed_at = Column(DateTime, default=datetime.utcnow)
 
     # target_price: the user's personal price goal — e.g. "notify me when it drops below $40"

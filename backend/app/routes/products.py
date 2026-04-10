@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import text
+from sqlalchemy.orm import selectinload
 from app import get_db
 from app.models.product import Product, PriceHistory, ProductSubscriber, Session
 from app.scraper.amazon import scrape_amazon_product
-from app.services.email import send_email
+from app.services.email import send_email, send_email_async
 from app.routes.auth import get_current_user
 from datetime import datetime
 
@@ -22,7 +23,11 @@ def get_products():
     # Return a list of all tracked products
     db = next(get_db())
     try:
-        all_products = db.query(Product).all()
+        # Pre-load price_history and subscribers to avoid N+1 queries when to_dict() is called in a loop
+        all_products = db.query(Product).options(
+            selectinload(Product.price_history),
+            selectinload(Product.subscribers)
+        ).all()
         products_list = [product.to_dict() for product in all_products]
         return jsonify({
             "message": "Success",
@@ -226,8 +231,8 @@ def subscribe_to_product(product_id):
         else:
             price_note = "We'll alert you whenever the price drops."
 
-        # Send a confirmation email with the unsubscribe link already in it
-        send_email(
+        # Send a confirmation email async so the user doesn't wait for SMTP to respond
+        send_email_async(
             to_email=email,
             notification_type='PRICE_DROP',
             product_data={

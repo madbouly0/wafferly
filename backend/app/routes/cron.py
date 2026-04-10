@@ -4,6 +4,7 @@ from app.models.product import Product, PriceHistory
 from app.scraper.amazon import scrape_amazon_product
 from app.services.email import send_email, notify_subscribers
 from app.utils import get_email_notif_type
+import concurrent.futures
 
 cron_bp = Blueprint('cron', __name__)
 
@@ -28,12 +29,41 @@ def update_all_products():
         failed_count = 0
         notified_count = 0
 
+        # Create a mapping of product ID to product object for easy access
+        product_map = {p.id: p for p in all_products}
+        
+        # Scrape all products concurrently
+        print(f"\n🚀 Starting parallel scraping for {len(all_products)} products...")
+        scraped_results = {}
+        
+        def scrape_task(pid, url):
+            try:
+                return pid, scrape_amazon_product(url)
+            except Exception as e:
+                print(f"❌ Exception in scrape thread for product {pid}: {str(e)}")
+                return pid, None
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+            future_to_pid = {
+                executor.submit(scrape_task, p.id, p.url): p.id 
+                for p in all_products
+            }
+            
+            for future in concurrent.futures.as_completed(future_to_pid):
+                pid = future_to_pid[future]
+                try:
+                    product_id, scraped_data = future.result()
+                    scraped_results[product_id] = scraped_data
+                except Exception as exc:
+                    print(f"❌ Thread generated an exception for product {pid}: {exc}")
+                    scraped_results[pid] = None
+
+        print(f"✅ Finished parallel scraping. Now updating database sequentially...\n")
+
+        # Now update the database sequentially to ensure thread safety
         for product in all_products:
             try:
-                print(f"\n🔄 Scraping: {product.title[:50]}...")
-
-                # Scrape the latest data from Amazon
-                scraped = scrape_amazon_product(product.url)
+                scraped = scraped_results.get(product.id)
 
                 if not scraped:
                     print(f"❌ Failed to scrape: {product.url}")

@@ -1,6 +1,5 @@
 import Navbar from '@/components/Navbar'
 import NewsletterForm from '@/components/NewsletterForm'
-import MagneticCursor from '@/components/MagneticCursor'
 import SmoothScroller from '@/components/SmoothScroller'
 import './globals.css'
 import type { Metadata } from 'next'
@@ -45,9 +44,6 @@ export default function RootLayout({
 
           {/* Accessibility: jump past nav for keyboard users */}
           <a href="#main-content" className="skip-link">Skip to main content</a>
-
-          {/* Magnetic cursor (dot + ring) */}
-          <MagneticCursor />
 
           {/* ── Site header ── */}
           <header role="banner">

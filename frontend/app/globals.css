@@ -2132,22 +2132,7 @@ textarea.form-control {
   will-change: transform;
 }
 
-/* ─────────────────────────────────────────────
-   MAGNETIC CURSOR — hide native cursor on Desktop
-───────────────────────────────────────────── */
-@media (pointer: fine) {
 
-  *,
-  *::before,
-  *::after {
-    cursor: none !important;
-  }
-}
-
-.cursor-dot,
-.cursor-ring {
-  mix-blend-mode: difference;
-}
 
 /* ─────────────────────────────────────────────
    PRODUCT PAGE — PINCER LAYOUT

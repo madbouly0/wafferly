@@ -19,69 +19,52 @@ export default function CollectionCard({ id, name, productCount, previewImages, 
     const displayImages = images.slice(0, 4);
 
     return (
-        <div
+        <button
             onClick={onClick}
-            style={{
-                background: isExpanded ? 'var(--color-primary)' : 'var(--color-white)',
-                borderRadius: 'var(--radius-20)',
-                border: isExpanded ? '1px solid var(--color-primary)' : '1px solid var(--color-light)',
-                boxShadow: isExpanded ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '1rem',
-                gap: '1.25rem'
-            }}
-            className="collection-card hover:-translate-y-1"
+            type="button"
+            aria-expanded={isExpanded}
+            aria-controls={`collection-items-${id}`}
+            className={`
+                w-full text-left flex items-center p-5 gap-5 rounded-3xl border transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#3b5d50] focus:ring-offset-2 group
+                ${isExpanded
+                    ? 'bg-[#3b5d50] border-[#3b5d50] shadow-lg'
+                    : 'bg-white border-[#dce5e4] shadow-sm hover:shadow-md'
+                }
+            `}
         >
             {/* Collage Cover - 2x2 Grid */}
-            <div style={{
-                width: '80px', height: '80px', flexShrink: 0,
-                display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '2px',
-                borderRadius: 'var(--radius-10)', overflow: 'hidden',
-                background: 'var(--color-lighter)'
-            }}>
+            <div className="w-[72px] h-[72px] shrink-0 grid grid-cols-2 grid-rows-2 gap-[2px] rounded-2xl overflow-hidden bg-[#eff2f1] shadow-inner">
                 {displayImages.map((img, i) => (
-                    <div key={i} style={{ background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div key={i} className="bg-white flex items-center justify-center">
                         {img ? (
-                            <Image src={img} alt="preview" width={40} height={40} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                            <Image src={img} alt="" width={36} height={36} className="object-cover w-full h-full" />
                         ) : (
-                            <div style={{ background: 'var(--color-lighter)', width: '100%', height: '100%' }}></div>
+                            <div className="bg-[#eff2f1] w-full h-full"></div>
                         )}
                     </div>
                 ))}
             </div>
 
             {/* Info Area */}
-            <div style={{ flex: 1 }}>
-                <h3 style={{
-                    fontFamily: 'var(--font-spaceGrotesk)', fontSize: '1.1rem', fontWeight: 700,
-                    color: isExpanded ? 'white' : 'var(--color-dark)', marginBottom: '4px',
-                    transition: 'color 0.3s ease'
-                }}>
+            <div className="flex-1 min-w-0">
+                <h3 className={`font-[Space_Grotesk] text-[1.1rem] font-bold mb-1 tracking-tight truncate transition-colors duration-300 ${isExpanded ? 'text-white' : 'text-[#2f2f2f]'}`}>
                     {name}
                 </h3>
-                <div style={{
-                    fontSize: '0.8rem', fontWeight: 600,
-                    color: isExpanded ? 'rgba(255,255,255,0.8)' : 'var(--color-body)'
-                }}>
+                <div className={`text-sm font-semibold ${isExpanded ? 'text-white/80' : 'text-[#6a6a6a]'}`}>
                     {productCount} {productCount === 1 ? 'item' : 'items'}
                 </div>
             </div>
 
             {/* Expand chevron */}
-            <div style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                background: isExpanded ? 'rgba(255,255,255,0.2)' : 'var(--color-lighter)',
-                color: isExpanded ? 'white' : 'var(--color-primary)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'all 0.3s ease'
-            }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <div className={`
+                w-[36px] h-[36px] rounded-full flex items-center justify-center transition-all duration-300 shrink-0
+                ${isExpanded
+                    ? 'bg-white/20 text-white rotate-180'
+                    : 'bg-[#eff2f1] text-[#3b5d50] group-hover:bg-[#3b5d50]/10'
+                }
+            `}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-        </div>
+        </button>
     );
 }

@@ -2,7 +2,8 @@
 
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { scrapeProduct } from '@/lib/api'
+import { scrapeProduct, subscribeToProduct } from '@/lib/api'
+import { isLoggedIn, getUserEmail, getSessionToken } from '@/lib/auth'
 
 const isValidAmazonProductURL = (url: string) => {
   try {
@@ -16,8 +17,8 @@ const isValidAmazonProductURL = (url: string) => {
 const Searchbar = () => {
   const router = useRouter()
   const [searchPrompt, setSearchPrompt] = useState('')
-  const [isLoading, setIsLoading]       = useState(false)
-  const [error, setError]               = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -33,6 +34,21 @@ const Searchbar = () => {
       // scrapeProduct returns the product data including its id
       const result = await scrapeProduct(searchPrompt)
       setSearchPrompt('')
+
+      if (isLoggedIn()) {
+        const email = getUserEmail()
+        const token = getSessionToken()
+        if (email && token) {
+          try {
+            await subscribeToProduct(result.data.id, email, undefined, token)
+            router.push(`/products/${result.data.id}`)
+            return
+          } catch (subErr) {
+            console.error('Failed to auto-subscribe', subErr)
+          }
+        }
+      }
+
       // Navigate directly to the product page using the returned product id
       router.push(`/products/${result.data.id}`)
     } catch {
@@ -75,7 +91,7 @@ const Searchbar = () => {
                 stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
                 style={{ animation: 'spin 0.8s linear infinite' }}
                 aria-hidden="true">
-                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
               </svg>
               Tracking…
             </span>
@@ -88,7 +104,7 @@ const Searchbar = () => {
           style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#ff7a7a', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           {error}
         </p>

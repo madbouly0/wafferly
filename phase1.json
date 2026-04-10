@@ -1,8 +1,0 @@
-{
-  "found": true,
-  "phase_number": "1",
-  "phase_name": "Dashboard Collections",
-  "goal": "Implement logical grouping and management of tracked products in the dashboard",
-  "success_criteria": [],
-  "section": "### Phase 1: Dashboard Collections\r\n**Goal:** Implement logical grouping and management of tracked products in the dashboard\r\n**Requirements:** REQ-3, REQ-4\r\n**Success criteria:**\r\n1. User can create, rename, and delete custom Collections from the dashboard.\r\n2. User can assign a tracked product to one or more Collections.\r\n3. User can view a dashboard filtered specifically to a single Collection."
-}

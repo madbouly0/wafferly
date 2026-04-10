@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { getUserEmail, getSessionToken } from "@/lib/auth";
 import { useDroppable } from "@dnd-kit/core";
+import { API_URL } from "@/lib/api";
+import { useDashboard } from "@/contexts/DashboardContext";
 
 // Helper component to make a collection link a drop target
 function DroppableNavItem({ id, href, isActive, name, count, isAllItems = false }: { id: string, href: string, isActive: boolean, name: string, count?: number, isAllItems?: boolean }) {
@@ -40,45 +42,12 @@ function DroppableNavItem({ id, href, isActive, name, count, isAllItems = false 
     );
 }
 
-type Collection = {
-    id: number;
-    name: string;
-    productCount: number;
-};
-
 export default function Sidebar({ currentPath }: { currentPath: string }) {
     const userEmail = getUserEmail();
-    const [collections, setCollections] = useState<Collection[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { collections, loading, refreshDashboard } = useDashboard();
+    
     const [isCreating, setIsCreating] = useState(false);
     const [newColName, setNewColName] = useState("");
-
-    const fetchCollections = async () => {
-        try {
-            const token = getSessionToken();
-            const res = await fetch("http://localhost:5000/api/collections", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setCollections(data.data || []);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchCollections();
-
-        // Listen for dashboard changes (e.g., from drag and drop) to refetch counts
-        const handleDashboardChanged = () => fetchCollections();
-        window.addEventListener("dashboard:changed", handleDashboardChanged);
-
-        return () => window.removeEventListener("dashboard:changed", handleDashboardChanged);
-    }, []);
 
     const handleCreateCollection = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,7 +55,7 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
 
         try {
             const token = getSessionToken();
-            const res = await fetch("http://localhost:5000/api/collections", {
+            const res = await fetch(`${API_URL}/collections`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,14 +67,14 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
             if (res.ok) {
                 setNewColName("");
                 setIsCreating(false);
-                fetchCollections(); // Refresh list
+                await refreshDashboard(); // Refresh list via context
             }
         } catch (err) {
             console.error("Failed to create collection", err);
         }
     };
 
-    const isAllItems = currentPath === "/dashboard";
+    const isAllItems = currentPath === "/dashboard" || currentPath === "/dashboard/page.tsx" || currentPath === "/dashboard/layout.tsx";
 
     return (
         <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'var(--font-inter)' }}>
@@ -132,7 +101,7 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
                 <DroppableNavItem
                     id="collection-all-items"
                     href="/dashboard"
-                    isActive={isAllItems}
+                    isActive={currentPath === "/dashboard"}
                     name="All Items"
                     isAllItems={true}
                 />
