@@ -117,29 +117,29 @@ export default function DashboardPage() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Redesigned Metrics Grid */}
                 {trackedProducts.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 -mt-16 relative z-10 mb-10">
-                        <div className="bg-[#2d4a40] text-white p-6 rounded-2xl shadow-xl border border-[#3b5d50] transform transition-transform hover:-translate-y-1">
-                            <div className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <IconTracking className="w-4 h-4" /> Actively Tracking
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 -mt-8 relative z-10 mb-6 max-w-3xl mx-auto">
+                        <div className="bg-[#2d4a40] text-white p-2.5 sm:p-3 rounded-xl shadow-md border border-[#3b5d50] transform transition-transform hover:-translate-y-1">
+                            <div className="text-white/60 text-[8px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <IconTracking className="w-2.5 h-2.5" /> Actively Tracking
                             </div>
-                            <div className="font-[Space_Grotesk] text-4xl font-black mb-2 tracking-tight">{totalTracked}</div>
-                            <p className="text-xs text-white/70 leading-relaxed font-medium">Items monitored constantly. We'll alert you the moment a price drops.</p>
+                            <div className="font-[Space_Grotesk] text-xl font-black mb-1 tracking-tight">{totalTracked}</div>
+                            <p className="text-[8px] sm:text-[9px] text-white/70 leading-snug font-medium">Items monitored constantly. We'll alert you the moment a price drops.</p>
                         </div>
 
-                        <div className="bg-[#f9bf29] text-[#2d4a40] p-6 rounded-2xl shadow-xl border border-[#f8b810] transform transition-transform hover:-translate-y-1">
-                            <div className="text-[#2d4a40]/60 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <IconSavings className="w-4 h-4" /> Potential Savings
+                        <div className="bg-[#f9bf29] text-[#2d4a40] p-2.5 sm:p-3 rounded-xl shadow-md border border-[#f8b810] transform transition-transform hover:-translate-y-1">
+                            <div className="text-[#2d4a40]/60 text-[8px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <IconSavings className="w-2.5 h-2.5" /> Potential Savings
                             </div>
-                            <div className="font-[Space_Grotesk] text-4xl font-black mb-2 tracking-tight">{displayCurrency}{potentialSavings.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
-                            <p className="text-xs text-[#2d4a40]/80 leading-relaxed font-medium">Total theoretical value saved if all tracked items are purchased right now.</p>
+                            <div className="font-[Space_Grotesk] text-xl font-black mb-1 tracking-tight">{displayCurrency}{potentialSavings.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+                            <p className="text-[8px] sm:text-[9px] text-[#2d4a40]/80 leading-snug font-medium">Total theoretical value saved if all tracked items are purchased right now.</p>
                         </div>
 
-                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-[#dce5e4] transform transition-transform hover:-translate-y-1">
-                            <div className="text-[#6a6a6a] text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <IconLowestPrice className="w-4 h-4 text-[#3b5d50]" /> Actionable Deals
+                        <div className="bg-white p-2.5 sm:p-3 rounded-xl shadow-md border border-[#dce5e4] transform transition-transform hover:-translate-y-1">
+                            <div className="text-[#6a6a6a] text-[8px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1">
+                                <IconLowestPrice className="w-2.5 h-2.5 text-[#3b5d50]" /> Actionable Deals
                             </div>
-                            <div className="font-[Space_Grotesk] text-4xl font-black text-[#3b5d50] mb-2 tracking-tight">{atLowestPrice}</div>
-                            <p className="text-xs text-[#6a6a6a] leading-relaxed font-medium">Items currently sitting at or incredibly close to historically low records.</p>
+                            <div className="font-[Space_Grotesk] text-xl font-black text-[#3b5d50] mb-1 tracking-tight">{atLowestPrice}</div>
+                            <p className="text-[8px] sm:text-[9px] text-[#6a6a6a] leading-snug font-medium">Items currently sitting at or incredibly close to historically low records.</p>
                         </div>
                     </div>
                 )}
