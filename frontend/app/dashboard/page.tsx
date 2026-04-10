@@ -170,7 +170,7 @@ export default function DashboardPage() {
                                     {activeCollectionId ? "Collection Items" : "Workspace"}
                                 </div>
                                 <h2 className="font-[Space_Grotesk] text-3xl sm:text-4xl font-bold text-[#2f2f2f] m-0 tracking-tight">
-                                    {activeCollectionId ? "Collection Items" : "Unassigned Items"}
+                                    {activeCollectionId ? "Collection Items" : "tracked Items"}
                                 </h2>
                             </div>
                             <div className="flex items-center gap-4 w-full sm:w-auto">
