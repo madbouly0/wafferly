@@ -10,8 +10,8 @@ import { Menu, Transition } from '@headlessui/react'
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/products', label: 'Products' },
-  { href: '/about', label: 'About Us' },
+  { href: '/dashboard', label: 'Products' },
+  { href: '/#about', label: 'About Us' },
 ]
 
 const Navbar = () => {

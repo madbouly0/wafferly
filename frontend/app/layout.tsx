@@ -56,7 +56,7 @@ export default function RootLayout({
           </main>
 
           {/* ── Site footer ── */}
-          <footer role="contentinfo" className="footer-section">
+          <footer id="about" role="contentinfo" className="footer-section">
             <div className="footer-grid">
 
               {/* Brand column */}
